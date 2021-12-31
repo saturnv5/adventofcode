@@ -1,0 +1,56 @@
+package com.google.adventofcode.aoc2019;
+
+import com.google.adventofcode.lib.Day;
+import com.google.adventofcode.lib.GraphUtils;
+import com.google.adventofcode.lib.Pair;
+import com.google.common.collect.Iterables;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
+
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.List;
+
+public class Day6 extends Day {
+  public static void main(String[] args) {
+    new Day6().solve();
+  }
+
+  @Override
+  protected long part1(List<String> lines) {
+    return depthSum(parseTree(lines, true), "COM", 1);
+  }
+
+  @Override
+  protected long part2(List<String> lines) {
+    Graph<String> tree = parseTree(lines, false);
+    return shortestDistance(tree, parent(tree, "YOU"), parent(tree, "SAN"));
+  }
+
+  private static Graph<String> parseTree(List<String> lines, boolean directed) {
+    MutableGraph<String> tree = directed ? GraphBuilder.directed()
+            .build() : GraphBuilder.undirected().build();
+    for (String line : lines) {
+      String[] nodes = line.split("\\)");
+      tree.putEdge(nodes[0], nodes[1]);
+    }
+    return tree;
+  }
+
+  private static int depthSum(Graph<String> tree, String node, int depth) {
+    int sum = 0;
+    for (String n : tree.successors(node)) {
+      sum += depthSum(tree, n, depth + 1) + depth;
+    }
+    return sum;
+  }
+
+  private static String parent(Graph<String> tree, String node) {
+    return Iterables.getOnlyElement(tree.predecessors(node));
+  }
+
+  private static long shortestDistance(Graph<String> tree, String from, String to) {
+    return GraphUtils.shortestPath(tree, from, to).getCost();
+  }
+}
