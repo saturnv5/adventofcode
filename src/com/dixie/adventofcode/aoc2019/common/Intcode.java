@@ -1,4 +1,4 @@
-package com.google.adventofcode.aoc2019.common;
+package com.dixie.adventofcode.aoc2019.common;
 
 import java.util.Arrays;
 import java.util.HashMap;

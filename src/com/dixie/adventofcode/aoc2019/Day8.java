@@ -1,13 +1,11 @@
-package com.google.adventofcode.aoc2019;
+package com.dixie.adventofcode.aoc2019;
 
-import com.google.adventofcode.lib.Day;
-import com.google.adventofcode.lib.Memoizer;
+import com.dixie.adventofcode.lib.Day;
+import com.dixie.adventofcode.lib.Memoizer;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Day8 extends Day {

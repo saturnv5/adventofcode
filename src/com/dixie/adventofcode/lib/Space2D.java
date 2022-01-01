@@ -1,12 +1,9 @@
-package com.google.adventofcode.lib;
-
-import com.google.common.base.Functions;
+package com.dixie.adventofcode.lib;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Space2D<T> {

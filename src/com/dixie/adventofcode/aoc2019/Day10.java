@@ -1,8 +1,8 @@
-package com.google.adventofcode.aoc2019;
+package com.dixie.adventofcode.aoc2019;
 
-import com.google.adventofcode.lib.Day;
-import com.google.adventofcode.lib.Memoizer;
-import com.google.adventofcode.lib.Space2D;
+import com.dixie.adventofcode.lib.Day;
+import com.dixie.adventofcode.lib.Memoizer;
+import com.dixie.adventofcode.lib.Space2D;
 import com.google.common.math.IntMath;
 
 import java.awt.*;

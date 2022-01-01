@@ -1,4 +1,4 @@
-package com.google.adventofcode.lib;
+package com.dixie.adventofcode.lib;
 
 import com.google.common.collect.Streams;
 

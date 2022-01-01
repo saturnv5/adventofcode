@@ -1,8 +1,8 @@
-package com.google.adventofcode.aoc2019;
+package com.dixie.adventofcode.aoc2019;
 
-import com.google.adventofcode.aoc2019.common.Intcode;
-import com.google.adventofcode.lib.Day;
-import com.google.adventofcode.lib.StreamUtils;
+import com.dixie.adventofcode.lib.Day;
+import com.dixie.adventofcode.aoc2019.common.Intcode;
+import com.dixie.adventofcode.lib.StreamUtils;
 
 import java.util.List;
 

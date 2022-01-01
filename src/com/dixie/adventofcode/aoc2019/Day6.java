@@ -1,15 +1,12 @@
-package com.google.adventofcode.aoc2019;
+package com.dixie.adventofcode.aoc2019;
 
-import com.google.adventofcode.lib.Day;
-import com.google.adventofcode.lib.GraphUtils;
-import com.google.adventofcode.lib.Pair;
+import com.dixie.adventofcode.lib.Day;
+import com.dixie.adventofcode.lib.GraphUtils;
 import com.google.common.collect.Iterables;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
 import java.util.List;
 
 public class Day6 extends Day {
