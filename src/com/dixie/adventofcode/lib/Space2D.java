@@ -8,11 +8,11 @@ import java.util.stream.Stream;
 
 public class Space2D<T> {
   private final HashMap<Point, T> space = new HashMap<>();
-  private final int width;
-  private final int height;
+  private final Rectangle bounds;
 
   public static <T> Space2D<T> copyOf(Space2D<T> space) {
-    Space2D<T> copy = new Space2D<>(space.width, space.height);
+    Space2D<T> copy = new Space2D<>();
+    copy.bounds.setBounds(space.bounds);
     copy.space.putAll(space.space);
     return copy;
   }
@@ -32,17 +32,16 @@ public class Space2D<T> {
     return space;
   }
 
+  public Space2D() {
+    bounds = new Rectangle();
+  }
+
   public Space2D(int width, int height) {
-    this.width = width;
-    this.height = height;
+    bounds = new Rectangle(width, height);
   }
 
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
+  public Rectangle getBounds() {
+    return bounds;
   }
 
   public boolean hasValueAt(int x, int y) {
@@ -79,6 +78,7 @@ public class Space2D<T> {
       removeValueAt(p);
     } else {
       space.put(p, value);
+      bounds.add(p);
     }
   }
 

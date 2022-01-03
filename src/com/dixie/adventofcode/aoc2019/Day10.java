@@ -59,8 +59,8 @@ public class Day10 extends Day {
               dx /= gcd;
               dy /= gcd;
               Point shadow = new Point(asteroid.x + dx, asteroid.y + dy);
-              while (shadow.x >= 0 && shadow.x < space.getWidth()
-                      && shadow.y >= 0 && shadow.y < space.getHeight()) {
+              while (shadow.x >= 0 && shadow.x < space.getBounds().getWidth()
+                      && shadow.y >= 0 && shadow.y < space.getBounds().getWidth()) {
                 visibleAsteroids.removeValueAt(shadow);
                 shadow.translate(dx, dy);
               }
