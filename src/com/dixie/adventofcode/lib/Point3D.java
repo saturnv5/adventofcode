@@ -15,10 +15,22 @@ public class Point3D {
     this.z = z;
   }
 
-  public void move(int x, int y, int z) {
+  public Point3D(Point3D p) {
+    this.x = p.x;
+    this.y = p.y;
+    this.z = p.z;
+  }
+
+  public void set(int x, int y, int z) {
     this.x = x;
     this.y = y;
     this.z = z;
+  }
+
+  public void set(Point3D p) {
+    this.x = p.x;
+    this.y = p.y;
+    this.z = p.z;
   }
 
   public void translate(Point3D delta) {
