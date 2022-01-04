@@ -25,4 +25,33 @@ public class Day13 extends Day {
     }
     return numBlocks;
   }
+
+  @Override
+  protected long part2(List<String> lines) {
+    long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
+    program[0] = 2;
+    Intcode ic = new Intcode(program);
+    long score = -1;
+    int input = 0;
+    long ballPos = -1;
+    long paddlePos = -1;
+    while (!ic.hasHalted()) {
+      Long x = ic.executeUntilOutput(input);
+      Long y = ic.executeUntilOutput(input);
+      Long tile = ic.executeUntilOutput(input);
+      if (tile != null) {
+        if (x == -1 && y == 0) {
+          score = tile;
+        } else if (tile == 3) {
+          paddlePos = x;
+        } else if (tile == 4) {
+          ballPos = x;
+        }
+      }
+      if (ballPos >= 0 && paddlePos >= 0) {
+        input = Long.signum(ballPos - paddlePos);
+      }
+    }
+    return score;
+  }
 }
