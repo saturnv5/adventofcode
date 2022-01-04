@@ -3,7 +3,9 @@ package com.dixie.adventofcode.lib;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Space2D<T> {
@@ -105,5 +107,18 @@ public class Space2D<T> {
 
   public Stream<Point> streamAllPoints() {
     return space.keySet().stream();
+  }
+
+  public String toPrintableImage(Function<T, String> valueConverter) {
+    StringBuilder sb = new StringBuilder();
+    Point p = new Point();
+    for (int y = bounds.y; y <= bounds.y + bounds.height; y++) {
+      sb.append('\n');
+      for (int x = bounds.x; x <= bounds.x + bounds.width; x++) {
+        p.move(x, y);
+        sb.append(valueConverter.apply(getValueAt(p)));
+      }
+    }
+    return sb.toString();
   }
 }

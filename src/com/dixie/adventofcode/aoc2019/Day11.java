@@ -15,14 +15,22 @@ public class Day11 extends Day {
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected long solve(List<String> lines, boolean part1) {
     long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
     Robot robot = new Robot(program);
     Space2D<Integer> panels = new Space2D<>();
+    if (!part1) {
+      panels.setValueAt(0, 0, 1);
+    }
 
     while (robot.advance(panels)) ;
 
-    return panels.streamAllPoints().count();
+    if (part1) {
+      return panels.streamAllPoints().count();
+    } else {
+      System.out.println(panels.toPrintableImage(i -> i == null || i == 0 ? "  " : "██"));
+      return -1;
+    }
   }
 
   private static class Robot {
