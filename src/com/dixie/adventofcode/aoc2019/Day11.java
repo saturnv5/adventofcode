@@ -1,5 +1,6 @@
 package com.dixie.adventofcode.aoc2019;
 
+import com.dixie.adventofcode.aoc2019.common.Intcode;
 import com.dixie.adventofcode.lib.Day;
 import com.dixie.adventofcode.lib.Direction;
 import com.dixie.adventofcode.lib.Space2D;
@@ -16,18 +17,33 @@ public class Day11 extends Day {
   @Override
   protected long part1(List<String> lines) {
     long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
-    Robot robot = new Robot();
-    Space2D<Boolean> panels = new Space2D<>();
-    int panelsPainted = 0;
-    return panelsPainted;
+    Robot robot = new Robot(program);
+    Space2D<Integer> panels = new Space2D<>();
+
+    while (robot.advance(panels)) ;
+
+    return panels.streamAllPoints().count();
   }
 
   private static class Robot {
-    Point location = new Point(0, 0);
-    Direction direction = Direction.NORTH;
+    private final Intcode program;
+    private final Point location = new Point(0, 0);
+    private Direction direction = Direction.NORTH;
 
-    void moveForward() {
+    Robot(long[] program) {
+      this.program = new Intcode(program);
+    }
+
+    boolean advance(Space2D<Integer> panels) {
+      Long colourToPaint = program.executeUntilOutput(panels.getValueAt(location, 0));
+      if (colourToPaint == null) {
+        return false;
+      }
+      panels.setValueAt(location, colourToPaint.intValue());
+      Long leftOrRight = program.executeUntilOutput(panels.getValueAt(location, 0));
+      direction = leftOrRight == 0 ? direction.turnLeft() : direction.turnRight();
       location.translate(direction.dx, direction.dy);
+      return true;
     }
   }
 }

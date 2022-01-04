@@ -32,10 +32,10 @@ public class Intcode {
     return lastOutput;
   }
 
-  public long executeUntilOutput(long... inputs) {
+  public Long executeUntilOutput(long... inputs) {
     PrimitiveIterator.OfLong inputItr = Arrays.stream(inputs).iterator();
     while (executeNextInstruction(inputItr, false, true)) ;
-    return lastOutput;
+    return hasHalted ? null : lastOutput;
   }
 
   public boolean hasHalted() {
@@ -46,8 +46,9 @@ public class Intcode {
     return lastOutput;
   }
 
-  private boolean executeNextInstruction(PrimitiveIterator.OfLong input, boolean stopOnInput, boolean stopOnOutput) {
-    String op = String.valueOf(memory.get(index));
+  private boolean executeNextInstruction(
+      PrimitiveIterator.OfLong input, boolean stopOnInput, boolean stopOnOutput) {
+    String op = String.valueOf(readMemory(index));
     int opCode = op.length() == 1
             ? op.charAt(0) - '0'
             : Integer.parseInt(op.substring(op.length() - 2));
@@ -145,17 +146,21 @@ public class Intcode {
   private long evalArg(String op, int argIndex) {
     int mode = op.length() >= argIndex + 2 ? op.charAt(op.length() - argIndex - 2) - '0' : 0;
     return switch (mode) {
-      case 1 -> memory.get(index + argIndex); // immediate
-      case 2 -> memory.get(baseIndex + memory.get(index + argIndex)); // relative
-      default -> memory.get(memory.get(index + argIndex)); // position
+      case 1 -> readMemory(index + argIndex); // immediate
+      case 2 -> readMemory(baseIndex + readMemory(index + argIndex)); // relative
+      default -> readMemory(readMemory(index + argIndex)); // position
     };
   }
 
   private long evalAddress(String op, int argIndex) {
     if (op.length() >= argIndex + 2 && op.charAt(op.length() - argIndex - 2) == '2') {
-      return baseIndex + memory.get(index + argIndex);
+      return baseIndex + readMemory(index + argIndex);
     } else {
-      return memory.get(index + argIndex);
+      return readMemory(index + argIndex);
     }
+  }
+  
+  private long readMemory(long address) {
+    return memory.getOrDefault(address, 0L);
   }
 }

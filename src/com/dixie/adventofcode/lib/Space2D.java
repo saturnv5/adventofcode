@@ -70,14 +70,20 @@ public class Space2D<T> {
   }
 
   public void setValueAt(int x, int y, T value) {
-    setValueAt(new Point(x, y), value);
+    Point p = new Point(x, y);
+    if (value == null) {
+      removeValueAt(p);
+    } else {
+      space.put(p, value);
+      bounds.add(p);
+    }
   }
 
   public void setValueAt(Point p, T value) {
     if (value == null) {
       removeValueAt(p);
     } else {
-      space.put(p, value);
+      space.put(new Point(p), value);
       bounds.add(p);
     }
   }
