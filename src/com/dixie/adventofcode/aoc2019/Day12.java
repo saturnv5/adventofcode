@@ -7,6 +7,7 @@ import com.google.common.math.LongMath;
 
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Day12 extends Day {
   public static void main(String[] args) {
@@ -22,68 +23,44 @@ public class Day12 extends Day {
 
   @Override
   protected long part2(List<String> lines) {
-    Moon[] moons = lines.stream().map(Moon::new).toArray(Moon[]::new);
-    Moon[] initialState = clone(moons);
-    Moon[] empty = new Moon[moons.length];
-    ArrayList<Long> periods = new ArrayList<>();
+    List<Moon> moons = lines.stream().map(Moon::new).toList();
+    List<Integer> baseX = stateX(moons), baseY = stateY(moons), baseZ = stateZ(moons);
+    long xPeriod = 0, yPeriod = 0, zPeriod = 0;
 
-    // Record individual periods for x-axis only.
-    Moon[] moonsX = moons;
-    List<Moon> moonsXList = Arrays.asList(Arrays.copyOf(moonsX, moonsX.length));
-    long steps = 0;
-    while(!Arrays.equals(moonsX, empty)) {
-      Arrays.stream(moonsX)
-          .filter(Predicates.notNull())
-          .forEach(m -> m.updateVelocityX(moonsXList));
-      Arrays.stream(moonsX).filter(Predicates.notNull()).forEach(Moon::updateLocation);
-      steps++;
-      maybeRecordPeriod(initialState, moonsX, periods, steps);
-    }
-
-    // Record individual periods for y-axis only.
-    Moon[] moonsY = clone(initialState);
-    List<Moon> moonsYList = Arrays.asList(Arrays.copyOf(moonsY, moonsY.length));
-    steps = 0;
-    while(!Arrays.equals(moonsY, empty)) {
-      Arrays.stream(moonsY)
-          .filter(Predicates.notNull())
-          .forEach(m -> m.updateVelocityY(moonsYList));
-      Arrays.stream(moonsY).filter(Predicates.notNull()).forEach(Moon::updateLocation);
-      steps++;
-      maybeRecordPeriod(initialState, moonsY, periods, steps);
-    }
-
-    // Record individual periods for z-axis only.
-    Moon[] moonsZ = clone(initialState);
-    List<Moon> moonsZList = Arrays.asList(Arrays.copyOf(moonsZ, moonsZ.length));
-    steps = 0;
-    while(!Arrays.equals(moonsZ, empty)) {
-      Arrays.stream(moonsZ).filter(Predicates.notNull())
-          .forEach(m -> m.updateVelocityZ(moonsZList));
-      Arrays.stream(moonsZ).filter(Predicates.notNull()).forEach(Moon::updateLocation);
-      steps++;
-      maybeRecordPeriod(initialState, moonsZ, periods, steps);
-    }
-
-    return lcm(periods);
-  }
-
-  private static void maybeRecordPeriod(
-      Moon[] initialState, Moon[] currentState, List<Long> periods, long steps) {
-    for (int i = 0; i < initialState.length; i++) {
-      if (initialState[i].equals(currentState[i])) {
-        currentState[i] = null;
-        periods.add(steps);
+    for (int step = 1; true; step++) {
+      if (xPeriod > 0 && yPeriod > 0 && zPeriod > 0) {
+        break;
+      }
+      updateMoons(moons);
+      if (xPeriod == 0 && stateX(moons).equals(baseX)) {
+        xPeriod = step;
+      }
+      if (yPeriod == 0 && stateY(moons).equals(baseY)) {
+        yPeriod = step;
+      }
+      if (zPeriod == 0 && stateZ(moons).equals(baseZ)) {
+        zPeriod = step;
       }
     }
+
+    return lcm(xPeriod, yPeriod, zPeriod);
   }
 
-  private static Moon[] clone(Moon[] moons) {
-    return Arrays.stream(moons).map(Moon::new).toArray(Moon[]::new);
+  private static List<Integer> stateX(List<Moon> moons) {
+    return moons.stream().flatMap(m -> Stream.of(m.location.x, m.velocity.x)).toList();
   }
 
-  private static long lcm(List<Long> numbers) {
-    return -1;
+  private static List<Integer> stateY(List<Moon> moons) {
+    return moons.stream().flatMap(m -> Stream.of(m.location.y, m.velocity.y)).toList();
+  }
+
+  private static List<Integer> stateZ(List<Moon> moons) {
+    return moons.stream().flatMap(m -> Stream.of(m.location.z, m.velocity.z)).toList();
+  }
+
+  private static long lcm(long a, long b, long c) {
+    long lcm = (a * b) / LongMath.gcd(a, b);
+    return (lcm * c) / LongMath.gcd(lcm, c);
   }
 
   private static void updateMoons(List<Moon> moons) {
@@ -103,11 +80,6 @@ public class Day12 extends Day {
           Integer.parseInt(coord[2].substring(2)));
     }
 
-    Moon(Moon moon) {
-      this.velocity.set(moon.velocity);
-      this.location = new Point3D(moon.location);
-    }
-
     void updateVelocity(List<Moon> moons) {
       for (Moon moon : moons) {
         if (moon == this) {
@@ -119,33 +91,6 @@ public class Day12 extends Day {
       }
     }
 
-    void updateVelocityX(List<Moon> moons) {
-      for (Moon moon : moons) {
-        if (moon == this) {
-          continue;
-        }
-        velocity.x += Integer.signum(moon.location.x - location.x);
-      }
-    }
-
-    void updateVelocityY(List<Moon> moons) {
-      for (Moon moon : moons) {
-        if (moon == this) {
-          continue;
-        }
-        velocity.y += Integer.signum(moon.location.y - location.y);
-      }
-    }
-
-    void updateVelocityZ(List<Moon> moons) {
-      for (Moon moon : moons) {
-        if (moon == this) {
-          continue;
-        }
-        velocity.z += Integer.signum(moon.location.z - location.z);
-      }
-    }
-
     void updateLocation() {
       location.translate(velocity);
     }
@@ -153,15 +98,6 @@ public class Day12 extends Day {
     int getEnergy() {
       return (Math.abs(location.x) + Math.abs(location.y) + Math.abs(location.z))
           * (Math.abs(velocity.x) + Math.abs(velocity.y) + Math.abs(velocity.z));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      Moon moon = (Moon) o;
-      return Objects.equals(velocity, moon.velocity) &&
-          Objects.equals(location, moon.location);
     }
   }
 }
