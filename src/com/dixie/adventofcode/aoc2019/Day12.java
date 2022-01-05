@@ -1,6 +1,7 @@
 package com.dixie.adventofcode.aoc2019;
 
 import com.dixie.adventofcode.lib.Day;
+import com.dixie.adventofcode.lib.MathUtils;
 import com.dixie.adventofcode.lib.Point3D;
 import com.google.common.base.Predicates;
 import com.google.common.math.LongMath;
@@ -43,7 +44,7 @@ public class Day12 extends Day {
       }
     }
 
-    return lcm(xPeriod, yPeriod, zPeriod);
+    return MathUtils.lcm(xPeriod, yPeriod, zPeriod);
   }
 
   private static List<Integer> stateX(List<Moon> moons) {
@@ -56,11 +57,6 @@ public class Day12 extends Day {
 
   private static List<Integer> stateZ(List<Moon> moons) {
     return moons.stream().flatMap(m -> Stream.of(m.location.z, m.velocity.z)).toList();
-  }
-
-  private static long lcm(long a, long b, long c) {
-    long lcm = (a * b) / LongMath.gcd(a, b);
-    return (lcm * c) / LongMath.gcd(lcm, c);
   }
 
   private static void updateMoons(List<Moon> moons) {
