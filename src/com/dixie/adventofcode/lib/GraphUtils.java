@@ -1,10 +1,12 @@
 package com.dixie.adventofcode.lib;
 
+import com.google.common.collect.Streams;
 import com.google.common.graph.*;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class GraphUtils {
 
@@ -17,6 +19,13 @@ public class GraphUtils {
 
   public static <N> Path<N> shortestPath(ValueGraph<N, Long> graph, N origin, N destination) {
     return shortestPath(successorFromValueGraph(graph), origin, destination);
+  }
+
+  public static <N> Path<N> shortestNonWeightedPath(
+      Function<N, Stream<N>> successors, N origin, N destination) {
+    return shortestPath(
+        successors.andThen(s -> s.map(n -> Pair.of(n, 1L)).toList()), origin,
+        destination);
   }
 
   public static <N> Path<N> shortestPath(
