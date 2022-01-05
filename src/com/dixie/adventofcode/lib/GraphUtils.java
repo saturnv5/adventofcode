@@ -42,23 +42,6 @@ public class GraphUtils {
     return null; // Not found.
   }
 
-  public static <N, E> E depthFirstReduction(
-      ValueGraph<N, E> tree, E identity, BinaryOperator<E> accumulator, N origin) {
-    return depthFirstReduction(successorFromValueGraph(tree), identity, accumulator, origin);
-  }
-
-  public static <N, E> E depthFirstReduction(Function<N, Iterable<Pair<N, E>>> successors,
-      E identity, BinaryOperator<E> accumulator, N origin) {
-    E result = identity;
-    for (Pair<N, E> next : successors.apply(origin)) {
-      E subResult =
-          depthFirstReduction(successors, accumulator.apply(identity, next.second), accumulator,
-              next.first);
-      result = accumulator.apply(result, subResult);
-    }
-    return result;
-  }
-
   public static <N, E> Function<N, Iterable<Pair<N, E>>> successorFromValueGraph(
       ValueGraph<N, E> graph) {
     return n -> graph.successors(n)
