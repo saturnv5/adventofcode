@@ -1,5 +1,7 @@
 package com.dixie.adventofcode.lib;
 
+import java.awt.*;
+
 public enum Direction {
   NORTH(0, -1),
   EAST(1, 0),
@@ -26,5 +28,9 @@ public enum Direction {
   public Direction turnBack() {
     int back = Math.floorMod(ordinal() + 2, Direction.values().length);
     return Direction.values()[back];
+  }
+
+  public Point apply(Point from) {
+    return new Point(from.x + dx, from.y + dy);
   }
 }

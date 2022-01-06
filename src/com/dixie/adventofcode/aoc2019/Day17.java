@@ -6,7 +6,7 @@ import com.dixie.adventofcode.lib.Direction;
 import com.dixie.adventofcode.lib.Space2D;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class Day17 extends Day {
@@ -26,7 +26,24 @@ public class Day17 extends Day {
 
   @Override
   protected long part1(List<String> lines) {
-    Intcode ic = new Intcode((lines.get(0)));
+    Space2D<Character> space = constructSpace(lines.get(0));
+    System.out.println(space.toPrintableImage(String::valueOf));
+    return space.streamAllPoints()
+        .filter(p -> isIntersection(space, p))
+        .mapToInt(p -> p.x * p.y)
+        .sum();
+  }
+
+  @Override
+  protected long part2(List<String> lines) {
+    Space2D<Character> space = constructSpace(lines.get(0));
+    List<Direction> moves = computeMovements(space);
+    System.out.println(moves);
+    return super.part2(lines);
+  }
+
+  private static Space2D<Character> constructSpace(String line) {
+    Intcode ic = new Intcode(line);
     Space2D<Character> space = new Space2D<>();
     Long next;
     Point cur = new Point();
@@ -40,11 +57,37 @@ public class Day17 extends Day {
         cur.x++;
       }
     }
-    System.out.println(space.toPrintableImage(String::valueOf));
-    return space.streamAllPoints()
-        .filter(p -> isIntersection(space, p))
-        .mapToInt(p -> p.x * p.y)
-        .sum();
+    return space;
+  }
+
+  private static List<Direction> computeMovements(Space2D<Character> space) {
+    Point loc = space.streamAllPoints()
+        .filter(p -> DIRECTIONS.containsKey(space.getValueAt(p)))
+        .findFirst()
+        .get();
+    List<Direction> moves = new ArrayList<>();
+
+    exploreScaffolding(space, new HashSet<>(), loc, moves);
+
+    return moves;
+  }
+
+  private static void exploreScaffolding(
+      Space2D<Character> space, Set<Point> visited, Point loc, List<Direction> moves) {
+    if (!visited.add(loc)) {
+      return;
+    }
+    for (Direction dir : Direction.values()) {
+      Point newLoc = dir.apply(loc);
+      if (visited.contains(newLoc)) {
+        continue;
+      }
+      if (isEmpty(space.getValueAt(newLoc))) {
+        continue;
+      }
+      moves.add(dir);
+      exploreScaffolding(space, visited, newLoc, moves);
+    }
   }
 
   private static boolean isIntersection(Space2D<Character> space, Point p) {
@@ -52,7 +95,7 @@ public class Day17 extends Day {
       return false;
     }
     for (Direction dir : Direction.values()) {
-      if (isEmpty(space.getValueAt(p.x + dir.dx, p.y + dir.dy))) {
+      if (isEmpty(space.getValueAt(dir.apply(p)))) {
         return false;
       }
     }

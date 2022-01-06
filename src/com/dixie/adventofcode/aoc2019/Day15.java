@@ -32,7 +32,7 @@ public class Day15 extends Day {
         space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
     Path<Point> shortestPath = GraphUtils.shortestNonWeightedPath(
         p -> Arrays.stream(Direction.values())
-            .map(d -> new Point(p.x + d.dx, p.y + d.dy))
+            .map(d -> d.apply(p))
             .filter(l -> space.getValueAt(l, WALL) != WALL),
         start, oxygen);
     System.out.println(space.toPrintableImage(t -> t == null ? "  " : t == WALL ? "██" : ".."));
@@ -46,7 +46,7 @@ public class Day15 extends Day {
         space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
     Path<Point> longestPath = GraphUtils.longestBfsPath(
         p -> Arrays.stream(Direction.values())
-            .map(d -> new Point(p.x + d.dx, p.y + d.dy))
+            .map(d -> d.apply(p))
             .filter(l -> space.getValueAt(l, WALL) != WALL),
         oxygen);
     return longestPath.getCost();
@@ -74,7 +74,7 @@ public class Day15 extends Day {
     // Keep exploring.
     if (movedForward || fromDirection == null) {
       for (Direction nextDirection : Direction.values()) {
-        Point newLocation = new Point(location.x + nextDirection.dx, location.y + nextDirection.dy);
+        Point newLocation = nextDirection.apply(location);
         if (space.getValueAt(newLocation) == null) {
           explore(newLocation, nextDirection, space, moveFunction);
         }
