@@ -19,51 +19,68 @@ public class Day16 extends Day {
     int[] input =
         IntStream.range(0, lines.get(0).length()).map(i -> lines.get(0).charAt(i) - '0').toArray();
     int[] output = calculateOutput(input);
-    StringBuilder sb = new StringBuilder();
-    while (sb.length() < 8) {
-      sb.append((char) (output[sb.length()] + '0'));
-    }
-    return Long.parseLong(sb.toString());
+    return outputWithOffset(output, 0);
   }
 
   @Override
   protected long part2(List<String> lines) {
     String line = lines.get(0);
-    int targetPos = Integer.parseInt(line.substring(0, 8));
+    int targetPos = Integer.parseInt(line.substring(0, 7));
     int[] input =
         IntStream.range(0, lines.get(0).length()).map(i -> lines.get(0).charAt(i) - '0').toArray();
     int[] repeatedInput =
         Stream.generate(() -> input).limit(10000).flatMapToInt(Arrays::stream).toArray();
     int[] output = calculateOutput(repeatedInput);
+    return outputWithOffset(output, targetPos);
+  }
+
+  private static int outputWithOffset(int[] output, int offset) {
     StringBuilder sb = new StringBuilder();
     while (sb.length() < 8) {
-      sb.append((char) (output[targetPos + sb.length()] + '0'));
+      sb.append((char) (output[offset + sb.length()] + '0'));
     }
-    return Long.parseLong(sb.toString());
+    return Integer.parseInt(sb.toString());
   }
 
   private static int[] calculateOutput(int[] input) {
+    int[] output = new int[input.length];
     for (int i = 0; i < 100; i++) {
-      input = executePhase(input);
+      executePhase(input, output);
+      // Swap input <-> output arrays to save on memory allocation.
+      int[] tmp = input;
+      input = output;
+      output = tmp;
     }
     return input;
   }
 
-  private static int[] executePhase(int[] input) {
-    int[] output = new int[input.length];
+  private static void executePhase(int[] input, int[] output) {
+    convertToSums(input);
     for (int outIndex = 0; outIndex < output.length; outIndex++) {
-      long val = 0;
-      for (int inIndex = 0; inIndex < input.length; inIndex++) {
-        val += (long) getMultiplier(inIndex, outIndex) * input[inIndex];
-      }
-      val %= 10;
-      output[outIndex] = (int) Math.abs(val);
+      output[outIndex] = calculateOutput(input, outIndex);
     }
-    return output;
   }
 
-  private static int getMultiplier(int inputIndex, int outputIndex) {
-    int patternIndex = (inputIndex + 1) / (outputIndex + 1);
-    return PATTERN[patternIndex % PATTERN.length];
+  private static void convertToSums(int[] input) {
+    for (int i = 1; i < input.length; i++) {
+      input[i] += input[i - 1];
+    }
+  }
+
+  private static int calculateOutput(int[] sums, int outIndex) {
+    int val = 0;
+    for (int inIndex = outIndex + 1; inIndex <= sums.length; inIndex += outIndex + 1) {
+      int patternIndex = inIndex / (outIndex + 1);
+      int multiplier = PATTERN[patternIndex % PATTERN.length];
+      if (multiplier != 0) {
+        int lowIndex = inIndex - 2;
+        int highIndex = inIndex + outIndex - 1;
+        int low = lowIndex >= 0 ? sums[lowIndex] : 0;
+        int high = highIndex < sums.length ? sums[highIndex] : sums[sums.length - 1];
+        val += (high - low) * multiplier;
+      }
+    }
+    val %= 10;
+    return Math.abs(val);
   }
 }
