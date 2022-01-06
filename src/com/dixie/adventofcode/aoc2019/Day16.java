@@ -18,20 +18,20 @@ public class Day16 extends Day {
   protected long part1(List<String> lines) {
     int[] input =
         IntStream.range(0, lines.get(0).length()).map(i -> lines.get(0).charAt(i) - '0').toArray();
-    int[] output = calculateOutput(input);
+    int[] output = calculateOutput(input, 0);
     return outputWithOffset(output, 0);
   }
 
   @Override
   protected long part2(List<String> lines) {
     String line = lines.get(0);
-    int targetPos = Integer.parseInt(line.substring(0, 7));
+    int offset = Integer.parseInt(line.substring(0, 7));
     int[] input =
         IntStream.range(0, lines.get(0).length()).map(i -> lines.get(0).charAt(i) - '0').toArray();
     int[] repeatedInput =
         Stream.generate(() -> input).limit(10000).flatMapToInt(Arrays::stream).toArray();
-    int[] output = calculateOutput(repeatedInput);
-    return outputWithOffset(output, targetPos);
+    int[] output = calculateOutput(repeatedInput, offset);
+    return outputWithOffset(output, offset);
   }
 
   private static int outputWithOffset(int[] output, int offset) {
@@ -42,10 +42,10 @@ public class Day16 extends Day {
     return Integer.parseInt(sb.toString());
   }
 
-  private static int[] calculateOutput(int[] input) {
+  private static int[] calculateOutput(int[] input, int offset) {
     int[] output = new int[input.length];
     for (int i = 0; i < 100; i++) {
-      executePhase(input, output);
+      executePhase(input, output, offset);
       // Swap input <-> output arrays to save on memory allocation.
       int[] tmp = input;
       input = output;
@@ -54,10 +54,10 @@ public class Day16 extends Day {
     return input;
   }
 
-  private static void executePhase(int[] input, int[] output) {
+  private static void executePhase(int[] input, int[] output, int offset) {
     convertToSums(input);
-    for (int outIndex = 0; outIndex < output.length; outIndex++) {
-      output[outIndex] = calculateOutput(input, outIndex);
+    for (int outIndex = offset; outIndex < output.length; outIndex++) {
+      output[outIndex] = calculateSingleOutput(input, outIndex);
     }
   }
 
@@ -67,7 +67,7 @@ public class Day16 extends Day {
     }
   }
 
-  private static int calculateOutput(int[] sums, int outIndex) {
+  private static int calculateSingleOutput(int[] sums, int outIndex) {
     int val = 0;
     for (int inIndex = outIndex + 1; inIndex <= sums.length; inIndex += outIndex + 1) {
       int patternIndex = inIndex / (outIndex + 1);
