@@ -35,6 +35,7 @@ public class Day15 extends Day {
             .map(d -> new Point(p.x + d.dx, p.y + d.dy))
             .filter(l -> space.getValueAt(l, WALL) != WALL),
         start, oxygen);
+    System.out.println(space.toPrintableImage(t -> t == null ? "  " : t == WALL ? "██" : ".."));
     return shortestPath.getCost();
   }
 
@@ -52,7 +53,7 @@ public class Day15 extends Day {
   }
 
   private static Space2D<Integer> constructSpace(List<String> lines) {
-    Intcode ic = new Intcode(StreamUtils.streamLongs(lines.get(0), ",").toArray());
+    Intcode ic = new Intcode(lines.get(0));
     Space2D<Integer> space = new Space2D<>();
     Point start = new Point();
     space.setValueAt(start, EMPTY);

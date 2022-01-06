@@ -13,7 +13,7 @@ public class Day13 extends Day {
 
   @Override
   protected long part1(List<String> lines) {
-    Intcode ic = new Intcode(StreamUtils.streamLongs(lines.get(0), ",").toArray());
+    Intcode ic = new Intcode(lines.get(0));
     int numBlocks = 0;
     while (!ic.hasHalted()) {
       ic.executeUntilOutput(0);

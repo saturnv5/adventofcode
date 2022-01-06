@@ -1,5 +1,7 @@
 package com.dixie.adventofcode.aoc2019.common;
 
+import com.dixie.adventofcode.lib.StreamUtils;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.PrimitiveIterator;
@@ -11,6 +13,10 @@ public class Intcode {
   private long baseIndex = 0;
   private long lastOutput = -1;
   private boolean hasHalted = false;
+
+  public Intcode(String program) {
+    this(StreamUtils.streamLongs(program, ",").toArray());
+  }
 
   public Intcode(int[] memory) {
     IntStream.range(0, memory.length).forEach(i -> this.memory.put((long) i, (long) memory[i]));
