@@ -51,6 +51,28 @@ public class GraphUtils {
     return null; // Not found.
   }
 
+  public static <N> Path<N> longestBfsPath(Function<N, Stream<N>> successors, N origin) {
+    ArrayDeque<SearchNode<N>> fringe = new ArrayDeque<>();
+    HashSet<N> visited = new HashSet<>();
+    fringe.offer(new SearchNode<>(origin, null, 0));
+
+    SearchNode<N> lastNode = null;
+    while (!fringe.isEmpty()) {
+      SearchNode<N> current = fringe.poll();
+      if (!visited.add(current.node)) {
+        continue;
+      }
+      successors.apply(current.node).forEach(next -> {
+        if (!visited.contains(next)) {
+          fringe.offer(new SearchNode<>(next, current, current.cost + 1));
+        }
+      });
+      lastNode = current;
+    }
+
+    return lastNode == null ? null : new Path<>(lastNode.constructPath(), lastNode.cost);
+  }
+
   public static <N, E> Function<N, Iterable<Pair<N, E>>> successorFromValueGraph(
       ValueGraph<N, E> graph) {
     return n -> graph.successors(n)

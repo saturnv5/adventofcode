@@ -26,11 +26,8 @@ public class Day15 extends Day {
 
   @Override
   protected long part1(List<String> lines) {
-    Intcode ic = new Intcode(StreamUtils.streamLongs(lines.get(0), ",").toArray());
-    Space2D<Integer> space = new Space2D<>();
+    Space2D<Integer> space = constructSpace(lines);
     Point start = new Point();
-    space.setValueAt(start, EMPTY);
-    explore(new Point(), null, space, ic::executeUntilOutput);
     Point oxygen =
         space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
     Path<Point> shortestPath = GraphUtils.shortestNonWeightedPath(
@@ -39,6 +36,28 @@ public class Day15 extends Day {
             .filter(l -> space.getValueAt(l, WALL) != WALL),
         start, oxygen);
     return shortestPath.getCost();
+  }
+
+  @Override
+  protected long part2(List<String> lines) {
+    Space2D<Integer> space = constructSpace(lines);
+    Point oxygen =
+        space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
+    Path<Point> longestPath = GraphUtils.longestBfsPath(
+        p -> Arrays.stream(Direction.values())
+            .map(d -> new Point(p.x + d.dx, p.y + d.dy))
+            .filter(l -> space.getValueAt(l, WALL) != WALL),
+        oxygen);
+    return longestPath.getCost();
+  }
+
+  private static Space2D<Integer> constructSpace(List<String> lines) {
+    Intcode ic = new Intcode(StreamUtils.streamLongs(lines.get(0), ",").toArray());
+    Space2D<Integer> space = new Space2D<>();
+    Point start = new Point();
+    space.setValueAt(start, EMPTY);
+    explore(new Point(), null, space, ic::executeUntilOutput);
+    return space;
   }
 
   private static void explore(Point location, Direction fromDirection, Space2D<Integer> space,
