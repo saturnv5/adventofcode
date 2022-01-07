@@ -38,7 +38,8 @@ public class Day17 extends Day {
   protected long part2(List<String> lines) {
     Space2D<Character> space = constructSpace(lines.get(0));
     List<Direction> moves = computeMovements(space);
-    System.out.println(moves);
+    List<String> movementList = convertToMovementList(moves);
+    System.out.println(movementList);
     return super.part2(lines);
   }
 
@@ -58,6 +59,33 @@ public class Day17 extends Day {
       }
     }
     return space;
+  }
+
+  private static List<String> convertToMovementList(List<Direction> moves) {
+    List<String> movementList = new ArrayList<>();
+    Direction direction = Direction.NORTH;
+    int distMoved = 0;
+    for (Direction move : moves) {
+      if (move != direction) {
+        if (distMoved > 0) {
+          movementList.add(String.valueOf(distMoved));
+        }
+        if (direction.turnLeft() == move) {
+          movementList.add("L");
+        } else if (direction.turnRight() == move) {
+          movementList.add("R");
+        } else {
+          movementList.add("L");
+          movementList.add("L");
+        }
+        direction = move;
+        distMoved = 1;
+      } else {
+        distMoved++;
+      }
+    }
+    movementList.add(String.valueOf(distMoved));
+    return movementList;
   }
 
   private static List<Direction> computeMovements(Space2D<Character> space) {
@@ -87,6 +115,7 @@ public class Day17 extends Day {
       }
       moves.add(dir);
       exploreScaffolding(space, visited, newLoc, moves);
+      moves.add(dir.turnBack());
     }
   }
 
