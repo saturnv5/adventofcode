@@ -14,26 +14,32 @@ public class Day10 extends Day {
     new Day10().solve();
   }
 
+  private Space2D<Boolean> space;
+
+  @Override
+  protected long solve(List<String> lines, boolean part1) {
+    space = Space2D.parseFromStrings(lines, c -> c == '#' ? true : null);
+    return super.solve(lines, part1);
+  }
+
   @Override
   protected long part1(List<String> lines) {
-    Space2D<Boolean> space = Space2D.parseFromStrings(lines, c -> c == '#' ? true : null);
     return space.streamAllPoints()
-            .mapToLong(asteroid -> computeVisible(space, asteroid).streamAllPoints().count())
+            .mapToLong(asteroid -> computeVisible(asteroid).streamAllPoints().count())
             .max()
             .getAsLong();
   }
 
   @Override
   protected long part2(List<String> lines) {
-    Space2D<Boolean> space = Space2D.parseFromStrings(lines, c -> c == '#' ? true : null);
     Point station = space.streamAllPoints()
             .max(Comparator.comparing(
-                    Memoizer.memoize(a -> computeVisible(space, a).streamAllPoints().count())))
+                    Memoizer.memoize(a -> computeVisible(a).streamAllPoints().count())))
             .get();
     space.removeValueAt(station);
     int asteroidsDestroyed = 0;
     while (asteroidsDestroyed < 200) {
-      List<Point> toHit = computeVisible(space, station).streamAllPoints()
+      List<Point> toHit = computeVisible(station).streamAllPoints()
               .sorted(Comparator.comparing(Memoizer.memoize(a -> angle(station, a))))
               .toList();
       if (asteroidsDestroyed + toHit.size() < 200) {
@@ -47,7 +53,7 @@ public class Day10 extends Day {
     return -1;
   }
 
-  private static Space2D<Boolean> computeVisible(Space2D<Boolean> space, Point station) {
+  private Space2D<Boolean> computeVisible(Point station) {
     Space2D<Boolean> visibleAsteroids = Space2D.copyOf(space);
     visibleAsteroids.removeValueAt(station);
     space.streamAllPoints()

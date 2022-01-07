@@ -13,9 +13,16 @@ public class Day8 extends Day {
     new Day8().solve();
   }
 
+  private List<List<Integer>> layers;
+
+  @Override
+  protected long solve(List<String> lines, boolean part1) {
+    layers = parseLayers(lines.get(0), 25 * 6);
+    return super.solve(lines, part1);
+  }
+
   @Override
   protected long part1(List<String> lines) {
-    List<List<Integer>> layers = parseLayers(lines.get(0), 25 * 6);
     List<Integer> fewestZeros = layers.stream()
             .min(Comparator.comparing(Memoizer.memoize(l -> countOccurrences(l, 0))))
             .get();
@@ -24,8 +31,7 @@ public class Day8 extends Day {
 
   @Override
   protected long part2(List<String> lines) {
-    List<List<Integer>> layers = parseLayers(lines.get(0), 25 * 6);
-    System.out.println(printableImage(drawImage(layers), 25));
+    System.out.println(printableImage(drawImage(), 25));
     return 0;
   }
 
@@ -41,7 +47,7 @@ public class Day8 extends Day {
     return (int) layer.stream().filter(i -> i == val).count();
   }
 
-  private static int[] drawImage(List<List<Integer>> layers) {
+  private int[] drawImage() {
     int[] image = new int[layers.get(0).size()];
     IntStream.range(0, image.length).forEach(i ->
             image[i] = layers.stream()

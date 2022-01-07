@@ -13,27 +13,25 @@ public class Day3 extends Day {
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected long solve(List<String> lines, boolean part1) {
     HashMap<Point, List<Wire>> occupied = new HashMap<>();
     lines.forEach(line -> layWire(line.split(","), occupied));
-    return intersections(occupied)
-            .map(Map.Entry::getKey)
-            .mapToInt(p -> Math.abs(p.x) + Math.abs(p.y))
-            .min()
-            .getAsInt();
+    if (part1) {
+      return intersections(occupied)
+          .map(Map.Entry::getKey)
+          .mapToInt(p -> Math.abs(p.x) + Math.abs(p.y))
+          .min()
+          .getAsInt();
+    } else {
+      return intersections(occupied)
+          .mapToInt(e -> sumSteps(e.getKey(), e.getValue()))
+          .min()
+          .getAsInt();
+    }
   }
 
-  @Override
-  protected long part2(List<String> lines) {
-    HashMap<Point, List<Wire>> occupied = new HashMap<>();
-    lines.stream().forEach(line -> layWire(line.split(","), occupied));
-    return intersections(occupied)
-            .mapToInt(e -> sumSteps(e.getKey(), e.getValue()))
-            .min()
-            .getAsInt();
-  }
-
-  private static Stream<Map.Entry<Point, List<Wire>>> intersections(HashMap<Point, List<Wire>> occupied) {
+  private static Stream<Map.Entry<Point, List<Wire>>> intersections(
+      HashMap<Point, List<Wire>> occupied) {
     return occupied.entrySet()
             .stream()
             .filter(e -> e.getValue().size() > 1);

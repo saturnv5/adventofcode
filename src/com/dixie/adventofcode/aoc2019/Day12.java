@@ -15,31 +15,37 @@ public class Day12 extends Day {
     new Day12().solve();
   }
 
+  private List<Moon> moons;
+
+  @Override
+  protected long solve(List<String> lines, boolean part1) {
+    moons = lines.stream().map(Moon::new).toList();
+    return super.solve(lines, part1);
+  }
+
   @Override
   protected long part1(List<String> lines) {
-    List<Moon> moons = lines.stream().map(Moon::new).toList();
-    IntStream.range(0, 1000).forEach(i -> updateMoons(moons));
+    IntStream.range(0, 1000).forEach(i -> updateMoons());
     return moons.stream().mapToInt(Moon::getEnergy).sum();
   }
 
   @Override
   protected long part2(List<String> lines) {
-    List<Moon> moons = lines.stream().map(Moon::new).toList();
-    List<Integer> baseX = stateX(moons), baseY = stateY(moons), baseZ = stateZ(moons);
+    List<Integer> baseX = stateX(), baseY = stateY(), baseZ = stateZ();
     long xPeriod = 0, yPeriod = 0, zPeriod = 0;
 
     for (int step = 1; true; step++) {
       if (xPeriod > 0 && yPeriod > 0 && zPeriod > 0) {
         break;
       }
-      updateMoons(moons);
-      if (xPeriod == 0 && stateX(moons).equals(baseX)) {
+      updateMoons();
+      if (xPeriod == 0 && stateX().equals(baseX)) {
         xPeriod = step;
       }
-      if (yPeriod == 0 && stateY(moons).equals(baseY)) {
+      if (yPeriod == 0 && stateY().equals(baseY)) {
         yPeriod = step;
       }
-      if (zPeriod == 0 && stateZ(moons).equals(baseZ)) {
+      if (zPeriod == 0 && stateZ().equals(baseZ)) {
         zPeriod = step;
       }
     }
@@ -47,19 +53,19 @@ public class Day12 extends Day {
     return MathUtils.lcm(xPeriod, yPeriod, zPeriod);
   }
 
-  private static List<Integer> stateX(List<Moon> moons) {
+  private List<Integer> stateX() {
     return moons.stream().flatMap(m -> Stream.of(m.location.x, m.velocity.x)).toList();
   }
 
-  private static List<Integer> stateY(List<Moon> moons) {
+  private List<Integer> stateY() {
     return moons.stream().flatMap(m -> Stream.of(m.location.y, m.velocity.y)).toList();
   }
 
-  private static List<Integer> stateZ(List<Moon> moons) {
+  private List<Integer> stateZ() {
     return moons.stream().flatMap(m -> Stream.of(m.location.z, m.velocity.z)).toList();
   }
 
-  private static void updateMoons(List<Moon> moons) {
+  private void updateMoons() {
     moons.forEach(m -> m.updateVelocity(moons));
     moons.forEach(Moon::updateLocation);
   }

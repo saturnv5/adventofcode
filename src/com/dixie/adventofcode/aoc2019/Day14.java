@@ -17,25 +17,31 @@ public class Day14 extends Day {
     new Day14().solve();
   }
 
+  private ValueGraph<String, Reaction> reactionTree;
+
+  @Override
+  protected long solve(List<String> lines, boolean part1) {
+    reactionTree = parseTree(lines);
+    return super.solve(lines, part1);
+  }
+
   @Override
   protected long part1(List<String> lines) {
-    ValueGraph<String, Reaction> reactionTree = parseTree(lines);
-    return findOreCost(reactionTree, new HashMap<>(), "FUEL", 1);
+    return findOreCost(new HashMap<>(), "FUEL", 1);
   }
 
   @Override
   protected long part2(List<String> lines) {
-    ValueGraph<String, Reaction> reactionTree = parseTree(lines);
     long numOres = 1_000_000_000_000L;
     long maxFuel = 1;
-    long maxOreCost = findOreCost(reactionTree, new HashMap<>(), "FUEL", maxFuel);
+    long maxOreCost = findOreCost(new HashMap<>(), "FUEL", maxFuel);
     while (maxOreCost < numOres) {
       long diff = (long) Math.floor(numOres / (maxOreCost / (double) maxFuel)) - maxFuel;
       if (diff <= 0) {
         break;
       }
       maxFuel += diff;
-      maxOreCost = findOreCost(reactionTree, new HashMap<>(), "FUEL", maxFuel);
+      maxOreCost = findOreCost(new HashMap<>(), "FUEL", maxFuel);
     }
     return maxFuel;
   }
@@ -57,8 +63,7 @@ public class Day14 extends Day {
     return tree;
   }
 
-  private static long findOreCost(ValueGraph<String, Reaction> reactionTree,
-      HashMap<String, Long> spareInputs, String output, long numOutputs) {
+  private long findOreCost(HashMap<String, Long> spareInputs, String output, long numOutputs) {
     if (output.equals("ORE")) {
       return numOutputs;
     }
@@ -71,7 +76,7 @@ public class Day14 extends Day {
         spareInputs.put(input, spares - amounts.first);
       } else {
         spareInputs.put(input, 0L);
-        oreCost += findOreCost(reactionTree, spareInputs, input, amounts.first - spares);
+        oreCost += findOreCost(spareInputs, input, amounts.first - spares);
       }
       if (amounts.second > numOutputs) {
         spareInputs.put(output, amounts.second - numOutputs);

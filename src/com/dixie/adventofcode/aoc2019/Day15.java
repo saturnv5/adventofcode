@@ -24,9 +24,16 @@ public class Day15 extends Day {
     DIRECTION_INPUT.put(Direction.EAST, 4);
   }
 
+  private Space2D<Integer> space;
+
+  @Override
+  protected long solve(List<String> lines, boolean part1) {
+    space = constructSpace(lines);
+    return super.solve(lines, part1);
+  }
+
   @Override
   protected long part1(List<String> lines) {
-    Space2D<Integer> space = constructSpace(lines);
     Point start = new Point();
     Point oxygen =
         space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
@@ -41,7 +48,6 @@ public class Day15 extends Day {
 
   @Override
   protected long part2(List<String> lines) {
-    Space2D<Integer> space = constructSpace(lines);
     Point oxygen =
         space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
     Path<Point> longestPath = GraphUtils.longestBfsPath(

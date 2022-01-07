@@ -19,24 +19,29 @@ public class Day17 extends Day {
     DIRECTIONS.put('v', Direction.SOUTH);
     DIRECTIONS.put('<', Direction.WEST);
   }
-  private static final char SCAFFOLD = '#';
   private static final char EMPTY = '.';
   private static final int MAX_WIRE_LENGTH = 20;
 
+  private Space2D<Character> space;
+
+  @Override
+  protected long solve(List<String> lines, boolean part1) {
+    space = constructSpace(lines.get(0));
+    return super.solve(lines, part1);
+  }
+
   @Override
   protected long part1(List<String> lines) {
-    Space2D<Character> space = constructSpace(lines.get(0));
     System.out.println(space.toPrintableImage(String::valueOf));
     return space.streamAllPoints()
-        .filter(p -> isIntersection(space, p))
+        .filter(p -> isIntersection(p))
         .mapToInt(p -> p.x * p.y)
         .sum();
   }
 
   @Override
   protected long part2(List<String> lines) {
-    Space2D<Character> space = constructSpace(lines.get(0));
-    List<String> movementCommands = computeMovementCommand(space);
+    List<String> movementCommands = computeMovementCommand();
     String input = computeRoutineInput(movementCommands);
     long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
     program[0] = 2;
@@ -61,7 +66,7 @@ public class Day17 extends Day {
     return space;
   }
 
-  private static List<String> computeMovementCommand(Space2D<Character> space) {
+  private List<String> computeMovementCommand() {
     List<String> movementCommands = new ArrayList<>();
     Point loc = space.streamAllPoints()
         .filter(p -> DIRECTIONS.containsKey(space.getValueAt(p)))
@@ -168,7 +173,7 @@ public class Day17 extends Day {
     return compressed;
   }
 
-  private static boolean isIntersection(Space2D<Character> space, Point p) {
+  private boolean isIntersection(Point p) {
     if (isEmpty(space.getValueAt(p))) {
       return false;
     }
