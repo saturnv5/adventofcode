@@ -37,9 +37,9 @@ public class Day17 extends Day {
   @Override
   protected long part2(List<String> lines) {
     Space2D<Character> space = constructSpace(lines.get(0));
-    List<Direction> moves = computeMovements(space);
-    List<String> movementList = convertToMovementList(moves);
-    System.out.println(movementList);
+    List<String> movementCommands = computeMovementCommand(space);
+    System.out.println(movementCommands);
+    System.out.println("Prefix: " + longestRepeatingPrefix(movementCommands));
     return super.part2(lines);
   }
 
@@ -61,62 +61,57 @@ public class Day17 extends Day {
     return space;
   }
 
-  private static List<String> convertToMovementList(List<Direction> moves) {
-    List<String> movementList = new ArrayList<>();
-    Direction direction = Direction.NORTH;
-    int distMoved = 0;
-    for (Direction move : moves) {
-      if (move != direction) {
-        if (distMoved > 0) {
-          movementList.add(String.valueOf(distMoved));
-        }
-        if (direction.turnLeft() == move) {
-          movementList.add("L");
-        } else if (direction.turnRight() == move) {
-          movementList.add("R");
-        } else {
-          movementList.add("L");
-          movementList.add("L");
-        }
-        direction = move;
-        distMoved = 1;
-      } else {
-        distMoved++;
-      }
-    }
-    movementList.add(String.valueOf(distMoved));
-    return movementList;
-  }
-
-  private static List<Direction> computeMovements(Space2D<Character> space) {
+  private static List<String> computeMovementCommand(Space2D<Character> space) {
+    List<String> movementCommands = new ArrayList<>();
     Point loc = space.streamAllPoints()
         .filter(p -> DIRECTIONS.containsKey(space.getValueAt(p)))
         .findFirst()
         .get();
-    List<Direction> moves = new ArrayList<>();
-
-    exploreScaffolding(space, new HashSet<>(), loc, moves);
-
-    return moves;
+    Direction dir = DIRECTIONS.get(space.getValueAt(loc));
+    int dist = 0;
+    while (true) {
+      Point newLoc = dir.apply(loc); // Try forwards.
+      if (isEmpty(space.getValueAt(newLoc))) {
+        if (dist > 0) {
+          movementCommands.add(String.valueOf(dist));
+        }
+        newLoc = dir.turnLeft().apply(loc); // Try left.
+        if (isEmpty(space.getValueAt(newLoc))) {
+          newLoc = dir.turnRight().apply(loc); // Try right.
+          if (isEmpty(space.getValueAt(newLoc))) {
+            return movementCommands; // Dead end.
+          } else {
+            movementCommands.add("R");
+            dir = dir.turnRight();
+          }
+        } else {
+          movementCommands.add("L");
+          dir = dir.turnLeft();
+        }
+        dist = 1;
+      } else {
+        dist++;
+      }
+      loc = newLoc;
+    }
   }
 
-  private static void exploreScaffolding(
-      Space2D<Character> space, Set<Point> visited, Point loc, List<Direction> moves) {
-    if (!visited.add(loc)) {
-      return;
-    }
-    for (Direction dir : Direction.values()) {
-      Point newLoc = dir.apply(loc);
-      if (visited.contains(newLoc)) {
-        continue;
+  private static List<String> longestRepeatingPrefix(List<String> sequence) {
+    List<String> prefix = new ArrayList<>();
+    while (prefix.size() < sequence.size()) {
+      prefix.add(sequence.get(prefix.size()));
+      boolean match = false;
+      for (int i = prefix.size(); i < sequence.size() - prefix.size() + 1; i++) {
+        if (prefix.equals(sequence.subList(i, i + prefix.size()))) {
+          match = true;
+          break;
+        }
       }
-      if (isEmpty(space.getValueAt(newLoc))) {
-        continue;
+      if (!match) {
+        return prefix.subList(0, prefix.size() - 1);
       }
-      moves.add(dir);
-      exploreScaffolding(space, visited, newLoc, moves);
-      moves.add(dir.turnBack());
     }
+    return prefix;
   }
 
   private static boolean isIntersection(Space2D<Character> space, Point p) {
