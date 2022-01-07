@@ -1,9 +1,7 @@
 package com.dixie.adventofcode.aoc2019;
 
 import com.dixie.adventofcode.aoc2019.common.Intcode;
-import com.dixie.adventofcode.lib.Day;
-import com.dixie.adventofcode.lib.Direction;
-import com.dixie.adventofcode.lib.Space2D;
+import com.dixie.adventofcode.lib.*;
 
 import java.awt.*;
 import java.util.*;
@@ -23,6 +21,7 @@ public class Day17 extends Day {
   }
   private static final char SCAFFOLD = '#';
   private static final char EMPTY = '.';
+  private static final int MAX_WIRE_LENGTH = 20;
 
   @Override
   protected long part1(List<String> lines) {
@@ -38,8 +37,10 @@ public class Day17 extends Day {
   protected long part2(List<String> lines) {
     Space2D<Character> space = constructSpace(lines.get(0));
     List<String> movementCommands = computeMovementCommand(space);
-    System.out.println(movementCommands);
-    return super.part2(lines);
+    String input = computeRoutineInput(movementCommands);
+    long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
+    program[0] = 2;
+    return new Intcode(program).executeUntilEnd(input.chars().mapToLong(c -> c).toArray());
   }
 
   private static Space2D<Character> constructSpace(String line) {
@@ -95,8 +96,76 @@ public class Day17 extends Day {
     }
   }
 
-  private static int wireLength(List<String> movementCommands) {
-    return movementCommands.stream().mapToInt(String::length).sum() + movementCommands.size() - 1;
+  private static String computeRoutineInput(List<String> movementCommands) {
+    List<String> patternA = new ArrayList<>();
+    List<String> patternB = new ArrayList<>();
+    List<String> patternC = new ArrayList<>();
+    List<String> mainFunction = findPatterns(movementCommands, patternA, patternB, patternC);
+    return String.join("\n",
+        String.join(",", mainFunction),
+        String.join(",", patternA),
+        String.join(",", patternB),
+        String.join(",", patternC)) + "\nn\n";
+  }
+
+  private static List<String> findPatterns(List<String> remainingCommands, List<String> patternA,
+      List<String> patternB, List<String> patternC) {
+    List<String> pattern = patternA.isEmpty() ? patternA : patternB.isEmpty() ? patternB : patternC;
+    String function = patternA.isEmpty() ? "A" : patternB.isEmpty() ? "B" : "C";
+    Pair<Integer, Integer> indices = maxPatternIndices(remainingCommands);
+    for (int i = indices.first; i < indices.second; i += 2) {
+      pattern.add(remainingCommands.get(i));
+      pattern.add(remainingCommands.get(i + 1));
+      List<String> compressed = applyPattern(remainingCommands, pattern, function);
+      if (pattern == patternC) {
+        if (maxPatternIndices(compressed).first == compressed.size()) {
+          // Found last pattern that fully cover the original command list.
+          return compressed;
+        }
+      } else {
+        compressed = findPatterns(compressed, patternA, patternB, patternC);
+        if (compressed != null) {
+          return compressed;
+        }
+      }
+    }
+    pattern.clear();
+    return null;
+  }
+
+  private static Pair<Integer, Integer> maxPatternIndices(List<String> commands) {
+    int from = 0;
+    while (from < commands.size()) {
+      String cmd = commands.get(from);
+      if (cmd.equals("L") || cmd.equals("R")) {
+        break;
+      }
+      from++;
+    }
+    int to = from;
+    int size = 0;
+    while (to < commands.size() && size < MAX_WIRE_LENGTH) {
+      String cmd = commands.get(from);
+      if (cmd.equals("A") || cmd.equals("B") || cmd.equals("C")) {
+        break;
+      }
+      to++;
+      size += cmd.length() + 1;
+    }
+    return Pair.of(from, to);
+  }
+
+  private static List<String> applyPattern(
+      List<String> commands, List<String> pattern, String function) {
+    List<String> compressed = new ArrayList<>(commands);
+    for (int i = 0; i <= compressed.size() - pattern.size(); i++) {
+      List<String> sub = compressed.subList(i, i + pattern.size());
+      if (pattern.equals(sub)) {
+        sub.subList(1, sub.size()).clear();
+        sub.set(0, function);
+      }
+    }
+    return compressed;
   }
 
   private static boolean isIntersection(Space2D<Character> space, Point p) {
