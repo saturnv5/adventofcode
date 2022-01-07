@@ -39,7 +39,6 @@ public class Day17 extends Day {
     Space2D<Character> space = constructSpace(lines.get(0));
     List<String> movementCommands = computeMovementCommand(space);
     System.out.println(movementCommands);
-    System.out.println("Prefix: " + longestRepeatingPrefix(movementCommands));
     return super.part2(lines);
   }
 
@@ -96,22 +95,8 @@ public class Day17 extends Day {
     }
   }
 
-  private static List<String> longestRepeatingPrefix(List<String> sequence) {
-    List<String> prefix = new ArrayList<>();
-    while (prefix.size() < sequence.size()) {
-      prefix.add(sequence.get(prefix.size()));
-      boolean match = false;
-      for (int i = prefix.size(); i < sequence.size() - prefix.size() + 1; i++) {
-        if (prefix.equals(sequence.subList(i, i + prefix.size()))) {
-          match = true;
-          break;
-        }
-      }
-      if (!match) {
-        return prefix.subList(0, prefix.size() - 1);
-      }
-    }
-    return prefix;
+  private static int wireLength(List<String> movementCommands) {
+    return movementCommands.stream().mapToInt(String::length).sum() + movementCommands.size() - 1;
   }
 
   private static boolean isIntersection(Space2D<Character> space, Point p) {
