@@ -6,6 +6,7 @@ import com.google.common.graph.*;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class GraphUtils {
@@ -23,20 +24,29 @@ public class GraphUtils {
 
   public static <N> Path<N> shortestNonWeightedPath(
       Function<N, Stream<N>> successors, N origin, N destination) {
+    return shortestNonWeightedPath(successors, origin, Predicate.isEqual(destination));
+  }
+
+  public static <N> Path<N> shortestNonWeightedPath(
+      Function<N, Stream<N>> successors, N origin, Predicate<N> endCondition) {
     return shortestPath(
-        successors.andThen(s -> s.map(n -> Pair.of(n, 1L)).toList()), origin,
-        destination);
+        successors.andThen(s -> s.map(n -> Pair.of(n, 1L)).toList()), origin, endCondition);
   }
 
   public static <N> Path<N> shortestPath(
       Function<N, Iterable<Pair<N, Long>>> successors, N origin, N destination) {
+    return shortestPath(successors, origin, Predicate.isEqual(destination));
+  }
+
+  public static <N> Path<N> shortestPath(
+      Function<N, Iterable<Pair<N, Long>>> successors, N origin, Predicate<N> endCondition) {
     PriorityQueue<SearchNode<N>> fringe = new PriorityQueue<>();
     HashSet<N> visited = new HashSet<>();
     fringe.offer(new SearchNode<>(origin, null, 0));
 
     while (!fringe.isEmpty()) {
       SearchNode<N> current = fringe.poll();
-      if (current.node.equals(destination)) {
+      if (endCondition.test(current.node)) {
         return new Path<>(current.constructPath(), current.cost);
       }
       if (!visited.add(current.node)) {
