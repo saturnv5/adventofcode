@@ -37,7 +37,7 @@ public class Day18 extends Day {
   }
 
   Stream<State> validMoves(State state) {
-    return Arrays.stream(Direction.values()).map(dir -> {
+    return Direction.CARDINALS.stream().map(dir -> {
       Point newLocation = dir.apply(state.location);
       Character cell = space.getValueAt(newLocation);
       if (cell == WALL) {

@@ -177,7 +177,7 @@ public class Day17 extends Day {
     if (isEmpty(space.getValueAt(p))) {
       return false;
     }
-    for (Direction dir : Direction.values()) {
+    for (Direction dir : Direction.CARDINALS) {
       if (isEmpty(space.getValueAt(dir.apply(p)))) {
         return false;
       }

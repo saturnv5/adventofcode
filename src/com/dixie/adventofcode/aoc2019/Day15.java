@@ -38,7 +38,7 @@ public class Day15 extends Day {
     Point oxygen =
         space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
     Path<Point> shortestPath = GraphUtils.shortestNonWeightedPath(
-        p -> Arrays.stream(Direction.values())
+        p -> Direction.CARDINALS.stream()
             .map(d -> d.apply(p))
             .filter(l -> space.getValueAt(l, WALL) != WALL),
         start, oxygen);
@@ -51,7 +51,7 @@ public class Day15 extends Day {
     Point oxygen =
         space.streamAllPoints().filter(p -> space.getValueAt(p) == OXYGEN).findFirst().get();
     Path<Point> longestPath = GraphUtils.longestBfsPath(
-        p -> Arrays.stream(Direction.values())
+        p -> Direction.CARDINALS.stream()
             .map(d -> d.apply(p))
             .filter(l -> space.getValueAt(l, WALL) != WALL),
         oxygen);
@@ -79,7 +79,7 @@ public class Day15 extends Day {
 
     // Keep exploring.
     if (movedForward || fromDirection == null) {
-      for (Direction nextDirection : Direction.values()) {
+      for (Direction nextDirection : Direction.CARDINALS) {
         Point newLocation = nextDirection.apply(location);
         if (space.getValueAt(newLocation) == null) {
           explore(newLocation, nextDirection, space, moveFunction);
