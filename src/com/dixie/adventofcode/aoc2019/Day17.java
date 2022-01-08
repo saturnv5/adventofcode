@@ -12,13 +12,12 @@ public class Day17 extends Day {
     new Day17().solve();
   }
 
-  private static final HashMap<Character, Direction> DIRECTIONS = new HashMap<>();
-  static {
-    DIRECTIONS.put('^', Direction.NORTH);
-    DIRECTIONS.put('>', Direction.EAST);
-    DIRECTIONS.put('v', Direction.SOUTH);
-    DIRECTIONS.put('<', Direction.WEST);
-  }
+  private static final Map<Character, Direction> DIRECTIONS = Map.of(
+      '^', Direction.NORTH,
+      '>', Direction.EAST,
+      'v', Direction.SOUTH,
+      '<', Direction.WEST);
+
   private static final char EMPTY = '.';
   private static final int MAX_WIRE_LENGTH = 20;
 

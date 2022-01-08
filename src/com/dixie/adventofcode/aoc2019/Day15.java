@@ -16,13 +16,11 @@ public class Day15 extends Day {
   }
 
   private static final int WALL = 0, EMPTY = 1, OXYGEN = 2;
-  private static final Map<Direction, Integer> DIRECTION_INPUT = new EnumMap<>(Direction.class);
-  static {
-    DIRECTION_INPUT.put(Direction.NORTH, 1);
-    DIRECTION_INPUT.put(Direction.SOUTH, 2);
-    DIRECTION_INPUT.put(Direction.WEST, 3);
-    DIRECTION_INPUT.put(Direction.EAST, 4);
-  }
+  private static final Map<Direction, Integer> DIRECTION_INPUT = Map.of(
+      Direction.NORTH, 1,
+      Direction.SOUTH, 2,
+      Direction.WEST, 3,
+      Direction.EAST, 4);
 
   private Space2D<Integer> space;
 

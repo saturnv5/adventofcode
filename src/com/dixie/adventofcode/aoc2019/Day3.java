@@ -1,6 +1,7 @@
 package com.dixie.adventofcode.aoc2019;
 
 import com.dixie.adventofcode.lib.Day;
+import com.dixie.adventofcode.lib.Direction;
 
 import java.awt.*;
 import java.util.*;
@@ -11,6 +12,12 @@ public class Day3 extends Day {
   public static void main(String[] args) {
     new Day3().solve();
   }
+
+  private static final Map<Character, Direction> DIRECTIONS = Map.of(
+      'U', Direction.NORTH,
+      'D', Direction.SOUTH,
+      'L', Direction.WEST,
+      'R', Direction.EAST);
 
   @Override
   protected long solve(List<String> lines, boolean part1) {
@@ -42,15 +49,10 @@ public class Day3 extends Day {
     Point p = new Point(0, 0);
     int dist = 0;
     for (String move : moves) {
-      char dir = move.charAt(0);
+      Direction dir = DIRECTIONS.get(move.charAt(0));
       int amount = Integer.parseInt(move.substring(1));
       for (int i = 0; i < amount; i++) {
-        switch (dir) {
-          case 'U' -> p = new Point(p.x, p.y - 1);
-          case 'D' -> p = new Point(p.x, p.y + 1);
-          case 'L' -> p = new Point(p.x - 1, p.y);
-          case 'R' -> p = new Point(p.x + 1, p.y);
-        }
+        p = dir.apply(p);
         dist++;
         if (!wire.wirePoints.containsKey(p)) {
           wire.wirePoints.put(p, dist);

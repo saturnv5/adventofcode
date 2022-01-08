@@ -39,15 +39,12 @@ public class Day18 extends Day {
   protected long part2(List<String> lines) {
     Point center = space.streamOccurrencesOf(ENTRANCE).findFirst().get();
     splitIntoQuadrants(space, center);
-    State topLeft = new State(Direction.NORTH_WEST.apply(center),
-        getDoors(p -> p.x < center.x && p.y < center.y));
-    State topRight = new State(Direction.NORTH_EAST.apply(center),
-        getDoors(p -> p.x > center.x && p.y < center.y));
-    State bottomLeft = new State(Direction.SOUTH_WEST.apply(center),
-        getDoors(p -> p.x < center.x && p.y > center.y));
-    State bottomRight = new State(Direction.SOUTH_EAST.apply(center),
-        getDoors(p -> p.x > center.x && p.y > center.y));
-    QuadState startState = new QuadState(List.of(topLeft, topRight, bottomLeft, bottomRight));
+    List<State> states = Direction.DIAGONALS.stream()
+        .map(dir -> new State(dir.apply(center), getDoors(
+            p -> Integer.signum(p.x - center.x) == dir.dx &&
+                Integer.signum(p.y - center.y) == dir.dy)))
+        .toList();
+    QuadState startState = new QuadState(states);
     long numKeys = space.streamAllPoints().map(space::getValueAt).filter(Day18::isKey).count();
     return GraphUtils.shortestNonWeightedPath(
         this::stateSuccessor, startState, new QuadStateVisitor(),
