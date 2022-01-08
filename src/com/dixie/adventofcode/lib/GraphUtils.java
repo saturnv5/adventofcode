@@ -29,8 +29,13 @@ public class GraphUtils {
 
   public static <N> Path<N> shortestNonWeightedPath(
       Function<N, Stream<N>> successors, N origin, Predicate<N> endCondition) {
+    return shortestNonWeightedPath(successors, origin, new DefaultVisitor<>(), endCondition);
+  }
+
+  public static <N> Path<N> shortestNonWeightedPath(Function<N, Stream<N>> successors, N origin,
+      Visitor<N> visitor, Predicate<N> endCondition) {
     return shortestPath(
-        successors.andThen(s -> s.map(n -> Pair.of(n, 1L)).toList()), origin, endCondition);
+        successors.andThen(s -> s.map(n -> Pair.of(n, 1L)).toList()), origin, visitor, endCondition);
   }
 
   public static <N> Path<N> shortestPath(
@@ -40,8 +45,12 @@ public class GraphUtils {
 
   public static <N> Path<N> shortestPath(
       Function<N, Iterable<Pair<N, Long>>> successors, N origin, Predicate<N> endCondition) {
+    return shortestPath(successors, origin, new DefaultVisitor<>(), endCondition);
+  }
+
+  public static <N> Path<N> shortestPath(Function<N, Iterable<Pair<N, Long>>> successors, N origin,
+      Visitor<N> visitor, Predicate<N> endCondition) {
     PriorityQueue<SearchNode<N>> fringe = new PriorityQueue<>();
-    HashSet<N> visited = new HashSet<>();
     fringe.offer(new SearchNode<>(origin, null, 0));
 
     while (!fringe.isEmpty()) {
@@ -49,11 +58,11 @@ public class GraphUtils {
       if (endCondition.test(current.node)) {
         return new Path<>(current.constructPath(), current.cost);
       }
-      if (!visited.add(current.node)) {
+      if (!visitor.visit(current.node)) {
         continue;
       }
       for (Pair<N, Long> next : successors.apply(current.node)) {
-        if (!visited.contains(next.first)) {
+        if (!visitor.hasVisited(next.first)) {
           fringe.offer(new SearchNode<>(next.first, current, current.cost + next.second));
         }
       }
@@ -116,6 +125,20 @@ public class GraphUtils {
     @Override
     public int compareTo(SearchNode<N> o) {
       return Long.compare(cost, o.cost);
+    }
+  }
+
+  private static class DefaultVisitor<N> implements Visitor<N> {
+    private final HashSet<N> visited = new HashSet<>();
+
+    @Override
+    public boolean hasVisited(N n) {
+      return visited.contains(n);
+    }
+
+    @Override
+    public boolean visit(N n) {
+      return visited.add(n);
     }
   }
 }
