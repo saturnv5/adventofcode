@@ -22,7 +22,7 @@ public class Day6 extends Day {
   @Override
   protected long part2(List<String> lines) {
     Graph<String> tree = parseTree(lines, false);
-    return GraphUtils.shortestPath(tree, parent(tree, "YOU"), parent(tree, "SAN")).getCost();
+    return GraphUtils.shortestPath(tree, "YOU", "SAN").getCost() - 2;
   }
 
   private static Graph<String> parseTree(List<String> lines, boolean directed) {
@@ -41,9 +41,5 @@ public class Day6 extends Day {
       sum += depthSum(tree, n, depth + 1) + depth;
     }
     return sum;
-  }
-
-  private static String parent(Graph<String> tree, String node) {
-    return Iterables.getOnlyElement(tree.predecessors(node));
   }
 }
