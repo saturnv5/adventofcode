@@ -48,9 +48,10 @@ public class Day18 extends Day {
     State bottomRight = new State(Direction.SOUTH_EAST.apply(center),
         getDoors(p -> p.x > center.x && p.y > center.y));
     QuadState startState = new QuadState(List.of(topLeft, topRight, bottomLeft, bottomRight));
+    long numKeys = space.streamAllPoints().map(space::getValueAt).filter(Day18::isKey).count();
     return GraphUtils.shortestNonWeightedPath(
         this::stateSuccessor, startState, new QuadStateVisitor(),
-        ss -> ss.states.stream().allMatch(s -> s.lockedDoors.isEmpty())).getCost();
+        ss -> ss.unlockedDoors.size() == numKeys).getCost();
   }
 
   private static void splitIntoQuadrants(Space2D<Character> space, Point center) {
