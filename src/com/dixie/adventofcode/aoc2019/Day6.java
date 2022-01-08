@@ -22,7 +22,7 @@ public class Day6 extends Day {
   @Override
   protected long part2(List<String> lines) {
     Graph<String> tree = parseTree(lines, false);
-    return shortestDistance(tree, parent(tree, "YOU"), parent(tree, "SAN"));
+    return GraphUtils.shortestPath(tree, parent(tree, "YOU"), parent(tree, "SAN")).getCost();
   }
 
   private static Graph<String> parseTree(List<String> lines, boolean directed) {
@@ -45,9 +45,5 @@ public class Day6 extends Day {
 
   private static String parent(Graph<String> tree, String node) {
     return Iterables.getOnlyElement(tree.predecessors(node));
-  }
-
-  private static long shortestDistance(Graph<String> tree, String from, String to) {
-    return GraphUtils.shortestPath(tree, from, to).getCost();
   }
 }
