@@ -8,6 +8,8 @@ import com.google.common.math.IntMath;
 import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Day10 extends Day {
   public static void main(String[] args) {
@@ -25,7 +27,7 @@ public class Day10 extends Day {
   @Override
   protected long part1(List<String> lines) {
     return space.streamAllPoints()
-            .mapToLong(asteroid -> computeVisible(asteroid).streamAllPoints().count())
+            .mapToLong(asteroid -> computeVisible(asteroid, false).streamAllPoints().count())
             .max()
             .getAsLong();
   }
@@ -34,26 +36,19 @@ public class Day10 extends Day {
   protected long part2(List<String> lines) {
     Point station = space.streamAllPoints()
             .max(Comparator.comparing(
-                    Memoizer.memoize(a -> computeVisible(a).streamAllPoints().count())))
+                Memoizer.memoize(a -> computeVisible(a, false).streamAllPoints().count())))
             .get();
     space.removeValueAt(station);
-    int asteroidsDestroyed = 0;
-    while (asteroidsDestroyed < 200) {
-      List<Point> toHit = computeVisible(station).streamAllPoints()
-              .sorted(Comparator.comparing(Memoizer.memoize(a -> angle(station, a))))
-              .toList();
-      if (asteroidsDestroyed + toHit.size() < 200) {
-        toHit.forEach(space::removeValueAt);
-        asteroidsDestroyed += toHit.size();
-      } else {
-        Point hit200 = toHit.get(200 - asteroidsDestroyed - 1);
-        return hit200.x * 100 + hit200.y;
-      }
-    }
-    return -1;
+    Point hit200 = Stream.generate(() -> space)
+        .flatMap(space -> computeVisible(station, true).streamAllPoints()
+            .sorted(Comparator.comparing(Memoizer.memoize(a -> angle(station, a)))))
+        .skip(199)
+        .findFirst()
+        .get();
+    return hit200.x * 100 + hit200.y;
   }
 
-  private Space2D<Boolean> computeVisible(Point station) {
+  private Space2D<Boolean> computeVisible(Point station, boolean removeAfter) {
     Space2D<Boolean> visibleAsteroids = Space2D.copyOf(space);
     visibleAsteroids.removeValueAt(station);
     space.streamAllPoints()
@@ -71,6 +66,9 @@ public class Day10 extends Day {
                 shadow.translate(dx, dy);
               }
             });
+    if (removeAfter) {
+      visibleAsteroids.streamAllPoints().forEach(space::removeValueAt);
+    }
     return visibleAsteroids;
   }
 
