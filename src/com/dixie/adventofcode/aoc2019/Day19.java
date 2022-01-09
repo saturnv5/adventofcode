@@ -2,7 +2,6 @@ package com.dixie.adventofcode.aoc2019;
 
 import com.dixie.adventofcode.aoc2019.common.Intcode;
 import com.dixie.adventofcode.lib.Day;
-import com.dixie.adventofcode.lib.Space2D;
 import com.dixie.adventofcode.lib.StreamUtils;
 
 import java.util.List;

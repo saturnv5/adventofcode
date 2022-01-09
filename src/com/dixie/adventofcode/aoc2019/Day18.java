@@ -44,7 +44,7 @@ public class Day18 extends Day {
             p -> Integer.signum(p.x - center.x) == dir.dx &&
                 Integer.signum(p.y - center.y) == dir.dy)))
         .toList();
-    QuadState startState = new QuadState(states);
+    QuadState startState = new QuadState(states, new HashSet<>());
     long numKeys = space.streamAllPoints().map(space::getValueAt).filter(Day18::isKey).count();
     return GraphUtils.shortestNonWeightedPath(
         this::stateSuccessor, startState, new QuadStateVisitor(),
@@ -101,14 +101,7 @@ public class Day18 extends Day {
     return cell >= 'A' && cell <= 'Z';
   }
 
-  private static class State {
-    final Point location;
-    final Set<Character> lockedDoors;
-
-    public State(Point location, Set<Character> lockedDoors) {
-      this.location = location;
-      this.lockedDoors = lockedDoors;
-    }
+  private record State(Point location, Set<Character> lockedDoors) {
 
     public State move(Point location, Character unlockedDoor) {
       if (unlockedDoor == null) {
@@ -127,31 +120,9 @@ public class Day18 extends Day {
       state.lockedDoors.remove(unlockedDoor);
       return state;
     }
-
-    @Override
-    public boolean equals(Object o) {
-      State state = (State) o;
-      return location.equals(state.location) && lockedDoors.equals(state.lockedDoors);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(location, lockedDoors);
-    }
   }
 
-  private static class QuadState {
-    final Set<Character> unlockedDoors;
-    final List<State> states;
-
-    public QuadState(List<State> states) {
-      this(states, new HashSet<>());
-    }
-
-    public QuadState(List<State> states, Set<Character> unlockedDoors) {
-      this.states = states;
-      this.unlockedDoors =  unlockedDoors;
-    }
+  private record QuadState(List<State> states, Set<Character> unlockedDoors) {
 
     public QuadState move(int locationIndex, Point location, Character unlockedDoor) {
       List<State> newStates = new ArrayList<>(states.size());

@@ -1,10 +1,8 @@
 package com.dixie.adventofcode.aoc2019;
 
 import com.dixie.adventofcode.lib.Day;
-import com.dixie.adventofcode.lib.GraphUtils;
 import com.dixie.adventofcode.lib.MathUtils;
 import com.dixie.adventofcode.lib.Pair;
-import com.google.common.base.Preconditions;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
@@ -85,14 +83,7 @@ public class Day14 extends Day {
     return oreCost;
   }
 
-  private static class Reaction {
-    final long inputIncrement;
-    final long outputIncrement;
-
-    Reaction(long inputIncrement, long outputIncrement) {
-      this.inputIncrement = inputIncrement;
-      this.outputIncrement = outputIncrement;
-    }
+  private record Reaction(long inputIncrement, long outputIncrement) {
 
     Pair<Long, Long> amountsForOutput(long outputs) {
       long factor = MathUtils.ceilDiv(outputs, outputIncrement);
