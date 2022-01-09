@@ -4,12 +4,10 @@ import com.dixie.adventofcode.lib.Day;
 import com.dixie.adventofcode.lib.Direction;
 import com.dixie.adventofcode.lib.GraphUtils;
 import com.dixie.adventofcode.lib.Space2D;
-import com.google.common.base.Predicates;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -65,26 +63,26 @@ public class Day20 extends Day {
 
   private Stream<Point> successors(Point p) {
     if (portals.containsKey(p)) {
-      return Stream.concat(Stream.of(portals.get(p)),
-          Direction.CARDINALS.stream().map(dir -> dir.apply(p)).filter(this::isEmpty));
+      return Stream.concat(Stream.of(portals.get(p)), validCardinalMoves(p));
     } else {
-      return Direction.CARDINALS.stream().map(dir -> dir.apply(p)).filter(this::isEmpty);
+      return validCardinalMoves(p);
     }
   }
 
   private Stream<State> successors(State state) {
-    return successors(state.location).map(p -> {
-      if (isInnerPortal(p)) {
-        if (state.depth == 0) {
-          return null;
-        }
-        return new State(p, state.depth - 1);
-      } else if (isOuterPortal(p)) {
-        return new State(p, state.depth + 1);
-      } else {
-        return new State(p, state.depth);
+    if (portals.containsKey(state.location)) {
+      boolean isOuter = isOuterPortal(state.location);
+      if (!isOuter || state.depth > 0) {
+        return Stream.concat(
+            Stream.of(new State(portals.get(state.location), state.depth + (isOuter ? -1 : 1))),
+            validCardinalMoves(state.location).map(p -> new State(p, state.depth)));
       }
-    }).filter(Predicates.notNull());
+    }
+    return validCardinalMoves(state.location).map(p -> new State(p, state.depth));
+  }
+
+  private Stream<Point> validCardinalMoves(Point p) {
+    return Direction.CARDINALS.stream().map(dir -> dir.apply(p)).filter(this::isEmpty);
   }
 
   private Optional<Direction> getEmptyDirection(Point p) {
@@ -114,13 +112,6 @@ public class Day20 extends Day {
     if (portals.containsKey(p)) {
       return p.x == 2 || p.x == space.getBounds().getWidth() - 3 || p.y == 2 ||
           p.y == space.getBounds().getHeight() - 3;
-    }
-    return false;
-  }
-
-  private boolean isInnerPortal(Point p) {
-    if (portals.containsKey(p)) {
-      return !isOuterPortal(p);
     }
     return false;
   }
