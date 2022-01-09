@@ -10,17 +10,27 @@ public class Day21 extends Day {
     new Day21().solve();
   }
 
-  private static final String[] PROGRAM = {
+  private static final String[] PROGRAM_1 = {
       "OR D J",
       "NOT C T",
-      "AND T J",
+      "AND T J", // Jump if landing spot is ground, but C is a hole.
       "NOT A T",
-      "OR T J",
+      "OR T J", // Also jump if right next to a hole.
       "WALK",
       ""
   };
-  private static final long[] INPUTS =
-      String.join("\n", PROGRAM).chars().mapToLong(c -> c).toArray();
+
+  private static final String[] PROGRAM_2 = {
+      "NOT B T",
+      "NOT C J",
+      "OR T J", // B or C are holes.
+      "AND D J", // Jump if landing spot is ground.
+      "AND H J", // But only if H is ground, in case we need to jump again immediately.
+      "NOT A T",
+      "OR T J", // Also jump if right next to a hole.
+      "RUN",
+      ""
+  };
 
   private Intcode ic;
 
@@ -33,7 +43,17 @@ public class Day21 extends Day {
   @Override
   protected long part1(List<String> lines) {
     // ic.setOutputConsumer(c -> System.out.print(toChar(c)));
-    return ic.executeUntilEnd(INPUTS);
+    return ic.executeUntilEnd(toInputs(PROGRAM_1));
+  }
+
+  @Override
+  protected long part2(List<String> lines) {
+    // ic.setOutputConsumer(c -> System.out.print(toChar(c)));
+    return ic.executeUntilEnd(toInputs(PROGRAM_2));
+  }
+
+  private static long[] toInputs(String[] program) {
+    return  String.join("\n", program).chars().mapToLong(c -> c).toArray();
   }
 
   private static char toChar(long ch) {
