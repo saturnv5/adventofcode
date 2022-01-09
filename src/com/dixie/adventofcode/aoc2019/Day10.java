@@ -41,7 +41,7 @@ public class Day10 extends Day {
     space.removeValueAt(station);
     Point hit200 = Stream.generate(() -> space)
         .flatMap(space -> computeVisible(station, true).streamAllPoints()
-            .sorted(Comparator.comparing(Memoizer.memoize(a -> angle(station, a)))))
+            .sorted(Comparator.comparing(a -> angle(station, a))))
         .skip(199)
         .findFirst()
         .get();
