@@ -5,6 +5,7 @@ import com.dixie.adventofcode.lib.StreamUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.PrimitiveIterator;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 public class Intcode {
@@ -13,6 +14,7 @@ public class Intcode {
   private long baseIndex = 0;
   private long lastOutput = -1;
   private boolean hasHalted = false;
+  private Consumer<Long> outputConsumer;
 
   public Intcode(String program) {
     this(StreamUtils.streamLongs(program, ",").toArray());
@@ -24,6 +26,10 @@ public class Intcode {
 
   public Intcode(long[] memory) {
     IntStream.range(0, memory.length).forEach(i -> this.memory.put((long) i, memory[i]));
+  }
+
+  public void setOutputConsumer(Consumer<Long> outputConsumer) {
+    this.outputConsumer = outputConsumer;
   }
 
   public long executeUntilEnd(long... inputs) {
@@ -120,6 +126,9 @@ public class Intcode {
   private void output(String op) {
     lastOutput = evalArg(op, 1);
     index += 2;
+    if (outputConsumer != null) {
+      outputConsumer.accept(lastOutput);
+    }
   }
 
   private void jump(String op, boolean jumpIfTrue) {
