@@ -109,12 +109,23 @@ public class Space2D<T> {
     return space.keySet().stream();
   }
 
+  public Stream<Point> streamAllPointsInBounds() {
+    return streamAllPointsInBounds(bounds);
+  }
+
+  public Stream<Point> streamAllPointsInBounds(Rectangle bounds) {
+    return IntStream.range(bounds.y, bounds.y + bounds.height)
+        .boxed()
+        .flatMap(
+            y -> IntStream.range(bounds.x, bounds.x + bounds.width).mapToObj(x -> new Point(x, y)));
+  }
+
   public String toPrintableImage(Function<T, String> valueConverter) {
     StringBuilder sb = new StringBuilder();
     Point p = new Point();
-    for (int y = bounds.y; y <= bounds.y + bounds.height; y++) {
+    for (int y = bounds.y; y < bounds.y + bounds.height; y++) {
       sb.append('\n');
-      for (int x = bounds.x; x <= bounds.x + bounds.width; x++) {
+      for (int x = bounds.x; x < bounds.x + bounds.width; x++) {
         p.move(x, y);
         sb.append(valueConverter.apply(getValueAt(p)));
       }
