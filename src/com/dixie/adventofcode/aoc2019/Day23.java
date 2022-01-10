@@ -32,18 +32,15 @@ public class Day23 extends Day {
   protected long solve(List<String> lines, boolean part1) {
     executor = Executors.newFixedThreadPool(50);
     long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
-    ics = Stream.generate(() -> new Intcode(program)).limit(50).toArray(Intcode[]::new);
-    inputs = IntStream.range(0, 50).mapToObj(i -> {
-      InputSupplier supplier = new InputSupplier(i);
-      ics[i].setInputSupplier(supplier);
-      return supplier;
-    }).toArray(InputSupplier[]::new);
-    long ans = super.solve(lines, part1);
-    try {
-      executor.shutdownNow();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+
+    for (int i = 0; i < 50; i++) {
+      ics[i] = new Intcode(program);
+      inputs[i] = new InputSupplier(i);
+      ics[i].setInputSupplier(inputs[i]);
     }
+
+    long ans = super.solve(lines, part1);
+    stopNetwork();
     return ans;
   }
 
@@ -92,6 +89,14 @@ public class Day23 extends Day {
           }
         }
       });
+    }
+  }
+
+  private void stopNetwork() {
+    try {
+      executor.shutdownNow();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
