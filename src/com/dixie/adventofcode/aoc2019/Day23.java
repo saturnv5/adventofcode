@@ -26,7 +26,7 @@ public class Day23 extends Day {
   private final AtomicLong natY = new AtomicLong();
   private ExecutorService executor;
   private Intcode[] ics;
-  InputSupplier[] inputs;
+  private InputSupplier[] inputs;
 
   @Override
   protected long solve(List<String> lines, boolean part1) {
