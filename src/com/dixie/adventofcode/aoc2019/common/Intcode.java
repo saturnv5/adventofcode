@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.PrimitiveIterator;
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 import java.util.stream.IntStream;
 
 public class Intcode {
@@ -14,6 +15,7 @@ public class Intcode {
   private long baseIndex = 0;
   private long lastOutput = -1;
   private boolean hasHalted = false;
+  private LongSupplier inputSupplier;
   private Consumer<Long> outputConsumer;
 
   public Intcode(String program) {
@@ -28,26 +30,35 @@ public class Intcode {
     IntStream.range(0, memory.length).forEach(i -> this.memory.put((long) i, memory[i]));
   }
 
+  public void setInputSupplier(LongSupplier inputSupplier) {
+    this.inputSupplier = inputSupplier;
+  }
+
   public void setOutputConsumer(Consumer<Long> outputConsumer) {
     this.outputConsumer = outputConsumer;
   }
 
-  public long executeUntilEnd(long... inputs) {
-    PrimitiveIterator.OfLong inputItr = Arrays.stream(inputs).iterator();
-    while (executeNextInstruction(inputItr, false, false)) ;
+  public long executeUntilEnd(long... inputOverride) {
+    while (executeNextInstruction(createInputSupplier(inputOverride), false, false)) ;
     return lastOutput;
   }
 
-  public long executeUntilInput(long... inputs) {
-    PrimitiveIterator.OfLong inputItr = Arrays.stream(inputs).iterator();
-    while (executeNextInstruction(inputItr, true, false)) ;
+  public long executeUntilInput(long... inputOverride) {
+    while (executeNextInstruction(createInputSupplier(inputOverride), true, false)) ;
     return lastOutput;
   }
 
-  public Long executeUntilOutput(long... inputs) {
-    PrimitiveIterator.OfLong inputItr = Arrays.stream(inputs).iterator();
-    while (executeNextInstruction(inputItr, false, true)) ;
+  public Long executeUntilOutput(long... inputOverride) {
+    while (executeNextInstruction(createInputSupplier(inputOverride), false, true)) ;
     return hasHalted ? null : lastOutput;
+  }
+
+  private LongSupplier createInputSupplier(long[] inputOverride) {
+    if (inputOverride.length == 0) {
+      return inputSupplier;
+    }
+    PrimitiveIterator.OfLong itr = Arrays.stream(inputOverride).iterator();
+    return itr::next;
   }
 
   public boolean hasHalted() {
@@ -59,7 +70,11 @@ public class Intcode {
   }
 
   private boolean executeNextInstruction(
-      PrimitiveIterator.OfLong input, boolean stopOnInput, boolean stopOnOutput) {
+      LongSupplier input, boolean stopOnInput, boolean stopOnOutput) {
+    if (hasHalted || Thread.interrupted()) {
+      hasHalted = true;
+      return false;
+    }
     String op = String.valueOf(readMemory(index));
     int opCode = op.length() == 1
             ? op.charAt(0) - '0'
@@ -74,7 +89,7 @@ public class Intcode {
         return true;
       }
       case 3 -> {
-        input(op, input.next());
+        input(op, input.getAsLong());
         return !stopOnInput;
       }
       case 4 -> {
