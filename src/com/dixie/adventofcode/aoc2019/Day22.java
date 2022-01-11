@@ -4,6 +4,7 @@ import com.dixie.adventofcode.lib.Day;
 import com.dixie.adventofcode.lib.MathUtils;
 import com.dixie.adventofcode.lib.Memoizer;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -17,6 +18,7 @@ public class Day22 extends Day {
 
   private static final int TOTAL_CARDS_1 = 10007;
   private static final long TOTAL_CARDS_2 = 119315717514047L;
+  private static final BigInteger TOTAL_CARDS_BIG_INT = BigInteger.valueOf(TOTAL_CARDS_2);
 
   private LongUnaryOperator inverseShuffle;
 
@@ -52,7 +54,7 @@ public class Day22 extends Day {
       int inc = Integer.parseInt(line.substring(20));
       return i -> Math.floorMod(i * inc, TOTAL_CARDS_1);
     }
-    return null;
+    return IntUnaryOperator.identity();
   }
 
   private static LongUnaryOperator parseInverseFunction(String line) {
@@ -63,9 +65,12 @@ public class Day22 extends Day {
       return i -> Math.floorMod(i + cut, TOTAL_CARDS_2);
     } else if (line.startsWith("deal with increment")) {
       int inc = Integer.parseInt(line.substring(20));
-      return i -> Math.floorMod(i * MathUtils.modInverse(inc, TOTAL_CARDS_2), TOTAL_CARDS_2);
+      return i -> BigInteger.valueOf(i)
+          .multiply(BigInteger.valueOf(MathUtils.modInverse(inc, TOTAL_CARDS_2)))
+          .mod(TOTAL_CARDS_BIG_INT)
+          .longValue();
     }
-    return null;
+    return LongUnaryOperator.identity();
   }
 
   private final BiFunction<Long, Long, Long> memoizedReverseShuffle =
