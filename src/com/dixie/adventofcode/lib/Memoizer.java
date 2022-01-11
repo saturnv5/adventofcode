@@ -23,6 +23,11 @@ public class Memoizer<T, R> implements Function<T, R> {
 
   @Override
   public R apply(T t) {
-    return cache.computeIfAbsent(t, loader);
+    R val = cache.get(t);
+    if (val == null) {
+      val = loader.apply(t);
+      cache.put(t, val);
+    }
+    return val;
   }
 }

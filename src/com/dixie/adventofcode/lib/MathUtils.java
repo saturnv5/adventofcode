@@ -2,6 +2,7 @@ package com.dixie.adventofcode.lib;
 
 import com.google.common.math.LongMath;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 public class MathUtils {
@@ -15,5 +16,9 @@ public class MathUtils {
 
   public static long ceilDiv(long dividend, long divisor) {
     return (dividend + divisor - 1) / divisor;
+  }
+
+  public static long inverseMod(long num, long modulus) {
+    return BigInteger.valueOf(num).modInverse(BigInteger.valueOf(modulus)).longValue();
   }
 }
