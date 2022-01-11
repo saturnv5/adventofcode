@@ -35,12 +35,11 @@ public class Day22 extends Day {
 
   @Override
   protected long part2(List<String> lines) {
-    System.out.println(lines.getClass().getSimpleName());
     Collections.reverse(lines);
     inverseShuffle = lines.stream()
         .map(Day22::parseInverseFunction)
         .reduce(LongUnaryOperator.identity(), LongUnaryOperator::andThen);
-    return reverseShuffle(2020, 101741582076661L);
+    return memoizedReverseShuffle.apply(2020L, 101741582076661L);
   }
 
   private static IntUnaryOperator parseFunction(String line) {
@@ -64,13 +63,15 @@ public class Day22 extends Day {
       return i -> Math.floorMod(i + cut, TOTAL_CARDS_2);
     } else if (line.startsWith("deal with increment")) {
       int inc = Integer.parseInt(line.substring(20));
-      return i -> Math.floorMod(i * MathUtils.inverseMod(inc, TOTAL_CARDS_2), TOTAL_CARDS_2);
+      return i -> Math.floorMod(i * MathUtils.modInverse(inc, TOTAL_CARDS_2), TOTAL_CARDS_2);
     }
     return null;
   }
 
   private final BiFunction<Long, Long, Long> memoizedReverseShuffle =
       Memoizer.memoize(this::reverseShuffle);
+
+  private long maxShuffles = 0;
 
   private long reverseShuffle(long endIndex, long numShuffles) {
     if (numShuffles == 0) {
@@ -81,6 +82,10 @@ public class Day22 extends Day {
     }
     long half = numShuffles / 2;
     endIndex = memoizedReverseShuffle.apply(endIndex, half);
+    if (half > maxShuffles) {
+      System.err.println(half);
+      maxShuffles = half;
+    }
     return memoizedReverseShuffle.apply(endIndex, numShuffles - half);
   }
 }

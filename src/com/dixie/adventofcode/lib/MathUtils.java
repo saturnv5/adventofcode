@@ -18,7 +18,7 @@ public class MathUtils {
     return (dividend + divisor - 1) / divisor;
   }
 
-  public static long inverseMod(long num, long modulus) {
+  public static long modInverse(long num, long modulus) {
     return BigInteger.valueOf(num).modInverse(BigInteger.valueOf(modulus)).longValue();
   }
 }
