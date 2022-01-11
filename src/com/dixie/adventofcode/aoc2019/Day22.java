@@ -72,25 +72,15 @@ public class Day22 extends Day {
   private final BiFunction<Long, Long, Long> memoizedReverseShuffle =
       Memoizer.memoize(this::reverseShuffle);
 
-  private long maxShufflesCompleted = 0;
-
   private long reverseShuffle(long endIndex, long numShuffles) {
     if (numShuffles == 0) {
       return endIndex;
     }
     if (numShuffles == 1) {
-      if (maxShufflesCompleted == 0) {
-        maxShufflesCompleted = 1;
-        System.out.println(1);
-      }
       return inverseShuffle.applyAsLong(endIndex);
     }
     long half = numShuffles / 2;
     endIndex = memoizedReverseShuffle.apply(endIndex, half);
-    if (maxShufflesCompleted < half) {
-      maxShufflesCompleted = half;
-      System.out.println(half);
-    }
     return memoizedReverseShuffle.apply(endIndex, numShuffles - half);
   }
 }
