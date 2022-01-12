@@ -21,4 +21,8 @@ public class MathUtils {
   public static long modInverse(long num, long modulus) {
     return BigInteger.valueOf(num).modInverse(BigInteger.valueOf(modulus)).longValue();
   }
+
+  public static BigInteger bigInt(long num) {
+    return BigInteger.valueOf(num);
+  }
 }

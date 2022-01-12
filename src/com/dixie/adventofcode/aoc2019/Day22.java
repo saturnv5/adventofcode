@@ -1,8 +1,11 @@
 package com.dixie.adventofcode.aoc2019;
 
+import static com.dixie.adventofcode.lib.MathUtils.bigInt;
+
 import com.dixie.adventofcode.lib.Day;
 import com.dixie.adventofcode.lib.MathUtils;
 import com.dixie.adventofcode.lib.Memoizer;
+import com.dixie.adventofcode.lib.Pair;
 
 import java.math.BigInteger;
 import java.util.Collections;
@@ -18,9 +21,8 @@ public class Day22 extends Day {
 
   private static final int TOTAL_CARDS_1 = 10007;
   private static final long TOTAL_CARDS_2 = 119315717514047L;
-  private static final BigInteger TOTAL_CARDS_BIG_INT = BigInteger.valueOf(TOTAL_CARDS_2);
-
-  private LongUnaryOperator inverseShuffle;
+  private static final BigInteger TOTAL_CARDS_BIG_INT = bigInt(TOTAL_CARDS_2);
+  private static final BigInteger TOTAL_SHUFFLES = bigInt(101741582076661L);
 
   @Override
   protected long solve(List<String> lines, boolean part1) {
@@ -37,11 +39,20 @@ public class Day22 extends Day {
 
   @Override
   protected long part2(List<String> lines) {
-    Collections.reverse(lines);
-    inverseShuffle = lines.stream()
-        .map(Day22::parseInverseFunction)
-        .reduce(LongUnaryOperator.identity(), LongUnaryOperator::andThen);
-    return memoizedReverseShuffle.apply(2020L, 101741582076661L);
+    // Collections.reverse(lines);
+    Pair<BigInteger, BigInteger> inverseShufflePolynomial = lines.stream()
+        .map(Day22::parseToPolynomial)
+        .reduce(Pair.of(BigInteger.ONE, BigInteger.ZERO), Day22::compose);
+    BigInteger a = inverseShufflePolynomial.first, b = inverseShufflePolynomial.second;
+    // k = no. shuffles
+    // m = a^(k-1) * inv(a-1)
+    BigInteger m = a.modPow(TOTAL_SHUFFLES.subtract(BigInteger.ONE), TOTAL_CARDS_BIG_INT)
+        .multiply(a.subtract(BigInteger.ONE).modInverse(TOTAL_CARDS_BIG_INT));
+    // x -> x*a^k + m*b
+    return bigInt(2020).multiply(a.modPow(TOTAL_SHUFFLES, TOTAL_CARDS_BIG_INT))
+        .add(m.multiply(b))
+        .mod(TOTAL_CARDS_BIG_INT)
+        .longValue();
   }
 
   private static IntUnaryOperator parseFunction(String line) {
@@ -57,40 +68,23 @@ public class Day22 extends Day {
     return IntUnaryOperator.identity();
   }
 
-  private static LongUnaryOperator parseInverseFunction(String line) {
+  /** Returns (a, b) representing polynomials of the form: a*x + b mod N */
+  private static Pair<BigInteger, BigInteger> parseToPolynomial(String line) {
     if (line.equals("deal into new stack")) {
-      return i -> TOTAL_CARDS_2 - i - 1;
+      return Pair.of(BigInteger.ONE.negate(), bigInt(TOTAL_CARDS_2 - 1));
     } else if (line.startsWith("cut")) {
       int cut = Integer.parseInt(line.substring(4));
-      return i -> Math.floorMod(i + cut, TOTAL_CARDS_2);
+      return Pair.of(BigInteger.ONE, bigInt(cut));
     } else if (line.startsWith("deal with increment")) {
       int inc = Integer.parseInt(line.substring(20));
-      return i -> BigInteger.valueOf(i)
-          .multiply(BigInteger.valueOf(MathUtils.modInverse(inc, TOTAL_CARDS_2)))
-          .mod(TOTAL_CARDS_BIG_INT)
-          .longValue();
+      return Pair.of(bigInt(inc).modInverse(TOTAL_CARDS_BIG_INT), BigInteger.ZERO);
     }
-    return LongUnaryOperator.identity();
+    return Pair.of(BigInteger.ONE, BigInteger.ZERO);
   }
 
-  private final BiFunction<Long, Long, Long> memoizedReverseShuffle =
-      Memoizer.memoize(this::reverseShuffle);
-
-  private long maxShuffles = 0;
-
-  private long reverseShuffle(long endIndex, long numShuffles) {
-    if (numShuffles == 0) {
-      return endIndex;
-    }
-    if (numShuffles == 1) {
-      return inverseShuffle.applyAsLong(endIndex);
-    }
-    long half = numShuffles / 2;
-    endIndex = memoizedReverseShuffle.apply(endIndex, half);
-    if (half > maxShuffles) {
-      System.err.println(half);
-      maxShuffles = half;
-    }
-    return memoizedReverseShuffle.apply(endIndex, numShuffles - half);
+  /** Given f(x) and g(x) polynomials, return f(g(x)). */
+  private static Pair<BigInteger, BigInteger> compose(Pair<BigInteger, BigInteger> f,
+      Pair<BigInteger, BigInteger> g) {
+    return Pair.of(f.first.multiply(g.first), f.first.multiply(g.second).add(f.second));
   }
 }
