@@ -13,8 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongSupplier;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Day23 extends Day {
   public static void main(String[] args) {

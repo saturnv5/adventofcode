@@ -39,17 +39,20 @@ public class Intcode {
   }
 
   public long executeUntilEnd(long... inputOverride) {
-    while (executeNextInstruction(createInputSupplier(inputOverride), false, false)) ;
+    LongSupplier input = createInputSupplier(inputOverride);
+    while (executeNextInstruction(input, false, false)) ;
     return lastOutput;
   }
 
   public long executeUntilInput(long... inputOverride) {
-    while (executeNextInstruction(createInputSupplier(inputOverride), true, false)) ;
+    LongSupplier input = createInputSupplier(inputOverride);
+    while (executeNextInstruction(input, true, false)) ;
     return lastOutput;
   }
 
   public Long executeUntilOutput(long... inputOverride) {
-    while (executeNextInstruction(createInputSupplier(inputOverride), false, true)) ;
+    LongSupplier input = createInputSupplier(inputOverride);
+    while (executeNextInstruction(input, false, true)) ;
     return hasHalted ? null : lastOutput;
   }
 
@@ -58,7 +61,7 @@ public class Intcode {
       return inputSupplier;
     }
     PrimitiveIterator.OfLong itr = Arrays.stream(inputOverride).iterator();
-    return itr::next;
+    return itr::nextLong;
   }
 
   public boolean hasHalted() {
