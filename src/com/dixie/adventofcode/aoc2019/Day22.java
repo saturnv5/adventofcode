@@ -3,16 +3,12 @@ package com.dixie.adventofcode.aoc2019;
 import static com.dixie.adventofcode.lib.MathUtils.bigInt;
 
 import com.dixie.adventofcode.lib.Day;
-import com.dixie.adventofcode.lib.MathUtils;
-import com.dixie.adventofcode.lib.Memoizer;
 import com.dixie.adventofcode.lib.Pair;
 
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.IntUnaryOperator;
-import java.util.function.LongUnaryOperator;
 
 public class Day22 extends Day {
   public static void main(String[] args) {
@@ -39,17 +35,19 @@ public class Day22 extends Day {
 
   @Override
   protected long part2(List<String> lines) {
-    // Collections.reverse(lines);
+    Collections.reverse(lines);
     Pair<BigInteger, BigInteger> inverseShufflePolynomial = lines.stream()
         .map(Day22::parseToPolynomial)
         .reduce(Pair.of(BigInteger.ONE, BigInteger.ZERO), Day22::compose);
     BigInteger a = inverseShufflePolynomial.first, b = inverseShufflePolynomial.second;
     // k = no. shuffles
-    // m = a^(k-1) * inv(a-1)
-    BigInteger m = a.modPow(TOTAL_SHUFFLES.subtract(BigInteger.ONE), TOTAL_CARDS_BIG_INT)
-        .multiply(a.subtract(BigInteger.ONE).modInverse(TOTAL_CARDS_BIG_INT));
-    // x -> x*a^k + m*b
-    return bigInt(2020).multiply(a.modPow(TOTAL_SHUFFLES, TOTAL_CARDS_BIG_INT))
+    // m = (a^k - 1) * inv(a-1) mod N
+    BigInteger atoK = a.modPow(TOTAL_SHUFFLES, TOTAL_CARDS_BIG_INT);
+    BigInteger m = atoK.subtract(BigInteger.ONE)
+        .multiply(a.subtract(BigInteger.ONE).modInverse(TOTAL_CARDS_BIG_INT))
+        .mod(TOTAL_CARDS_BIG_INT);
+    // x -> x*a^k + m*b mod N
+    return bigInt(2020).multiply(atoK)
         .add(m.multiply(b))
         .mod(TOTAL_CARDS_BIG_INT)
         .longValue();
@@ -82,9 +80,10 @@ public class Day22 extends Day {
     return Pair.of(BigInteger.ONE, BigInteger.ZERO);
   }
 
-  /** Given f(x) and g(x) polynomials, return f(g(x)). */
+  /** Given f(x) and g(x) polynomials, return g(f(x)). */
   private static Pair<BigInteger, BigInteger> compose(Pair<BigInteger, BigInteger> f,
       Pair<BigInteger, BigInteger> g) {
-    return Pair.of(f.first.multiply(g.first), f.first.multiply(g.second).add(f.second));
+    return Pair.of(f.first.multiply(g.first).mod(TOTAL_CARDS_BIG_INT),
+        g.first.multiply(f.second).add(g.second).mod(TOTAL_CARDS_BIG_INT));
   }
 }
