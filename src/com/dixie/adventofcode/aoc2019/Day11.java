@@ -15,7 +15,7 @@ public class Day11 extends Day {
   }
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
     Robot robot = new Robot(program);
     Space2D<Integer> panels = new Space2D<>();

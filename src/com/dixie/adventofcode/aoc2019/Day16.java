@@ -15,7 +15,7 @@ public class Day16 extends Day {
   private static final int[] PATTERN = {0, 1, 0, -1};
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     int[] input =
         IntStream.range(0, lines.get(0).length()).map(i -> lines.get(0).charAt(i) - '0').toArray();
     int[] output = calculateOutput(input, 0);
@@ -23,7 +23,7 @@ public class Day16 extends Day {
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     String line = lines.get(0);
     int offset = Integer.parseInt(line.substring(0, 7));
     int[] input =

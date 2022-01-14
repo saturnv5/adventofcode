@@ -24,13 +24,13 @@ public class Day17 extends Day {
   private Space2D<Character> space;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     space = constructSpace(lines.get(0));
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     System.out.println(space.toPrintableImage(String::valueOf));
     return space.streamAllPoints()
         .filter(p -> isIntersection(p))
@@ -39,7 +39,7 @@ public class Day17 extends Day {
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     List<String> movementCommands = computeMovementCommand();
     String input = computeRoutineInput(movementCommands);
     long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();

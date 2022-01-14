@@ -22,13 +22,13 @@ public class Day18 extends Day {
   private Space2D<Character> space;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     space = Space2D.parseFromStrings(lines, c -> (char) c);
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     Point start = space.streamOccurrencesOf(ENTRANCE).findFirst().get();
     Set<Character> lockedDoors = getDoors(Predicates.alwaysTrue());
     return GraphUtils.<State>shortestNonWeightedPath(this::stateSuccessor,
@@ -36,7 +36,7 @@ public class Day18 extends Day {
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     Point center = space.streamOccurrencesOf(ENTRANCE).findFirst().get();
     splitIntoQuadrants(space, center);
     List<State> states = Direction.DIAGONALS.stream()

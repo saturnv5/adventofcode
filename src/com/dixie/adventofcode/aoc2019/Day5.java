@@ -12,7 +12,7 @@ public class Day5 extends Day {
   }
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     Intcode ic = new Intcode(StreamUtils.streamInts(lines.get(0), ",").toArray());
     return ic.executeUntilEnd(part1 ? 1 : 5);
   }

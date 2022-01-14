@@ -27,7 +27,7 @@ public class Day23 extends Day {
   private InputSupplier[] inputs;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     executor = Executors.newFixedThreadPool(50);
     long[] program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
 
@@ -37,20 +37,20 @@ public class Day23 extends Day {
       ics[i].setInputSupplier(inputs[i]);
     }
 
-    long ans = super.solve(lines, part1);
+    Object ans = super.solve(lines, part1);
     stopNetwork();
     return ans;
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     SettableFuture<Long> yAt255 = SettableFuture.create();
     startNetwork(yAt255);
     return Futures.getUnchecked(yAt255);
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     startNetwork(SettableFuture.create());
     long lastY = Long.MIN_VALUE;
     while (true) {

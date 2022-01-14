@@ -16,15 +16,15 @@ public abstract class Day {
     System.out.println("Part 2: " + solve(lines, false));
   }
 
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     return part1 ? part1(lines) : part2(lines);
   }
 
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return 0;
   }
 
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     return 0;
   }
 }

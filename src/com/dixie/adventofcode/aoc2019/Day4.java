@@ -11,7 +11,7 @@ public class Day4 extends Day {
   }
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     int dashIndex = lines.get(0).indexOf('-');
     int from = Integer.parseInt(lines.get(0).substring(0, dashIndex));
     int to = Integer.parseInt(lines.get(0).substring(dashIndex + 1));

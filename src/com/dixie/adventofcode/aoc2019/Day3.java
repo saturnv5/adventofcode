@@ -20,7 +20,7 @@ public class Day3 extends Day {
       'R', Direction.EAST);
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     HashMap<Point, List<Wire>> occupied = new HashMap<>();
     lines.forEach(line -> layWire(line.split(","), occupied));
     if (part1) {

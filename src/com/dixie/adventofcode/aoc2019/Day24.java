@@ -22,14 +22,14 @@ public class Day24 extends Day {
   private Space2D<Boolean> space0;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     space0 = Space2D.parseFromStrings(lines, c -> c == '#');
     layers.put(0, space0);
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     HashSet<Long> ratings = new HashSet<>();
     ratings.add(rating(space0));
     while (true) {
@@ -42,7 +42,7 @@ public class Day24 extends Day {
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     IntStream.range(0, 200).forEach(i -> advanceTimeFolded());
     return layers.keySet().stream().mapToInt(this::numBugsInLayer).sum();
   }

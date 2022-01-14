@@ -35,19 +35,19 @@ public class Day21 extends Day {
   private Intcode ic;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     ic = new Intcode(lines.get(0));
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     // ic.setOutputConsumer(c -> System.out.print(toChar(c)));
     return ic.executeUntilEnd(toInputs(PROGRAM_1));
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     // ic.setOutputConsumer(c -> System.out.print(toChar(c)));
     return ic.executeUntilEnd(toInputs(PROGRAM_2));
   }

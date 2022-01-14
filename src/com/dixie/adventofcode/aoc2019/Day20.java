@@ -23,19 +23,19 @@ public class Day20 extends Day {
   HashMap<String, Point> namedPortals;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     constructSpaceAndPortals(lines);
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return GraphUtils.shortestNonWeightedPath(
         this::successors, namedPortals.get("AA"), namedPortals.get("ZZ")).getCost();
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     return GraphUtils.shortestNonWeightedPath(this::successors,
         new State(namedPortals.get("AA"), 0),
         new State(namedPortals.get("ZZ"), 0)).getCost();

@@ -13,7 +13,7 @@ public class Day25 extends Day {
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     Intcode ic = new Intcode(lines.get(0));
     PrimitiveIterator.OfLong input =
         String.join("\n", COMMANDS_1).chars().mapToLong(c -> c).iterator();

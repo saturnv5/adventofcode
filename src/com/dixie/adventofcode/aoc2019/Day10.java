@@ -19,13 +19,13 @@ public class Day10 extends Day {
   private Space2D<Boolean> space;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     space = Space2D.parseFromStrings(lines, c -> c == '#' ? true : null);
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return space.streamAllPoints()
             .mapToLong(asteroid -> computeVisible(asteroid, false).streamAllPoints().count())
             .max()
@@ -33,7 +33,7 @@ public class Day10 extends Day {
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     Point station = space.streamAllPoints()
             .max(Comparator.comparing(
                 Memoizer.memoize(a -> computeVisible(a, false).streamAllPoints().count())))

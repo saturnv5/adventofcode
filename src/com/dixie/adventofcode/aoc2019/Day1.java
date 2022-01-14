@@ -11,12 +11,12 @@ public class Day1 extends Day {
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return lines.stream().mapToLong(Long::parseLong).map(l -> l / 3 - 2).sum();
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     return lines.stream().mapToLong(Long::parseLong)
             .map(l -> {
               l = l / 3 - 2;

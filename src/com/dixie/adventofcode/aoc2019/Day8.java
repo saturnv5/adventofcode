@@ -16,13 +16,13 @@ public class Day8 extends Day {
   private List<List<Integer>> layers;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     layers = parseLayers(lines.get(0), 25 * 6);
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     List<Integer> fewestZeros = layers.stream()
             .min(Comparator.comparing(Memoizer.memoize(l -> countOccurrences(l, 0))))
             .get();
@@ -30,7 +30,7 @@ public class Day8 extends Day {
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     System.out.println(printableImage(drawImage(), 25));
     return 0;
   }

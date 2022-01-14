@@ -21,12 +21,12 @@ public class Day22 extends Day {
   private static final BigInteger TOTAL_SHUFFLES = bigInt(101741582076661L);
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     IntUnaryOperator shuffle = lines.stream()
         .map(Day22::parseFunction)
         .reduce(IntUnaryOperator.identity(), IntUnaryOperator::andThen);
@@ -34,7 +34,7 @@ public class Day22 extends Day {
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     Collections.reverse(lines);
     Pair<BigInteger, BigInteger> inverseShufflePolynomial = lines.stream()
         .map(Day22::parseToPolynomial)

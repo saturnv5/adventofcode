@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -39,5 +40,14 @@ public class StreamUtils {
 
   public static LongStream streamLongs(String line, String delimiter) {
     return Arrays.stream(line.split(delimiter)).mapToLong(Long::parseLong);
+  }
+
+  public static <T> Stream<Pair<T, T>> streamPairwise(List<T> list) {
+    return IntStream.range(0, list.size())
+        .boxed()
+        .flatMap(
+            i -> IntStream.range(0, list.size())
+                .filter(j -> i != j)
+                .mapToObj(j -> Pair.of(list.get(i), list.get(j))));
   }
 }

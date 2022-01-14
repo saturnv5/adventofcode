@@ -15,12 +15,12 @@ public class Day6 extends Day {
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return depthSum(parseTree(lines, true), "COM", 1);
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     Graph<String> tree = parseTree(lines, false);
     return GraphUtils.shortestPath(tree, "YOU", "SAN").getCost() - 2;
   }

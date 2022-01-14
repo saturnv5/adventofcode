@@ -12,12 +12,12 @@ public class Day9 extends Day {
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return runProgram(lines.get(0), 1);
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     return runProgram(lines.get(0), 2);
   }
 

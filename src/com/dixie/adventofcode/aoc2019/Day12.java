@@ -18,19 +18,19 @@ public class Day12 extends Day {
   private List<Moon> moons;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     moons = lines.stream().map(Moon::new).toList();
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     IntStream.range(0, 1000).forEach(i -> updateMoons());
     return moons.stream().mapToInt(Moon::getEnergy).sum();
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     List<Integer> baseX = stateX(), baseY = stateY(), baseZ = stateZ();
     long xPeriod = 0, yPeriod = 0, zPeriod = 0;
 

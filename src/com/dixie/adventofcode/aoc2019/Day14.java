@@ -18,18 +18,18 @@ public class Day14 extends Day {
   private ValueGraph<String, Reaction> reactionTree;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     reactionTree = parseTree(lines);
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return findOreCost(new HashMap<>(), "FUEL", 1);
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     long numOres = 1_000_000_000_000L;
     long maxFuel = 1;
     long maxOreCost = findOreCost(new HashMap<>(), "FUEL", maxFuel);

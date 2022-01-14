@@ -15,20 +15,20 @@ public class Day19 extends Day {
   private long[] program;
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
     return super.solve(lines, part1);
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return IntStream.range(0, 50)
         .mapToLong(y -> IntStream.range(0, 50).filter(x -> withinBeam(x, y)).count())
         .sum();
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     int x = 300, y = 200; // Can't imagine any input would have a beam large enough before 200.
     // Zigzag down the right edge of the beam while checking the extremities of a 100x100 box.
     // This only works by assuming the beam is solid and moves monotonically down and to the right.

@@ -12,12 +12,12 @@ public class Day1 extends Day {
   }
 
   @Override
-  protected long part1(List<String> lines) {
+  protected Object part1(List<String> lines) {
     return lines.stream().mapToInt(Integer::parseInt).sum();
   }
 
   @Override
-  protected long part2(List<String> lines) {
+  protected Object part2(List<String> lines) {
     HashSet<Integer> frequencies = new HashSet<>();
     int[] deltas = lines.stream().mapToInt(Integer::parseInt).toArray();
     int frequency = 0;

@@ -12,7 +12,7 @@ public class Day2 extends Day {
   }
 
   @Override
-  protected long solve(List<String> lines, boolean part1) {
+  protected Object solve(List<String> lines, boolean part1) {
     int[] memory = StreamUtils.streamInts(lines.get(0), ",").toArray();
     if (part1) {
       return execute(memory, 12, 2);
