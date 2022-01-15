@@ -120,7 +120,7 @@ public class Space2D<T> {
     return streamAllPointsInBounds(bounds);
   }
 
-  public Stream<Point> streamAllPointsInBounds(Rectangle bounds) {
+  public static Stream<Point> streamAllPointsInBounds(Rectangle bounds) {
     return IntStream.range(bounds.y, bounds.y + bounds.height)
         .boxed()
         .flatMap(
