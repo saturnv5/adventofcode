@@ -1,11 +1,15 @@
 package com.dixie.adventofcode.aoc2018;
 
 import com.dixie.adventofcode.lib.Day;
+import com.google.common.base.Predicates;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day5 extends Day {
   public static void main(String[] args) {
@@ -16,8 +20,20 @@ public class Day5 extends Day {
 
   @Override
   protected Object part1(List<String> lines) {
-    LinkedList<Integer> polymer = lines.get(0)
+    return polymerResultSize(lines.get(0), x -> true);
+  }
+
+  @Override
+  protected Object part2(List<String> lines) {
+    return IntStream.range('A', 'Z' + 1)
+        .map(x -> polymerResultSize(lines.get(0), u -> u != x && (u - REACT_DIFF) != x))
+        .min().getAsInt();
+  }
+
+  private static int polymerResultSize(String units, IntPredicate filter) {
+    LinkedList<Integer> polymer = units
         .chars()
+        .filter(filter)
         .boxed()
         .collect(Collectors.toCollection(LinkedList::new));
     ListIterator<Integer> itr = polymer.listIterator();
