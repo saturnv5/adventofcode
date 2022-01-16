@@ -20,6 +20,14 @@ public class Pair<A, B> {
     this.second = second;
   }
 
+  public A getFirst() {
+    return first;
+  }
+
+  public B getSecond() {
+    return second;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
