@@ -4,7 +4,6 @@ import com.dixie.adventofcode.lib.Day;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class Day1 extends Day {
   public static void main(String[] args) {
