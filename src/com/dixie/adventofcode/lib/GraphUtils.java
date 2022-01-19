@@ -4,7 +4,9 @@ import com.google.common.collect.Streams;
 import com.google.common.graph.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -71,6 +73,24 @@ public class GraphUtils {
   }
 
   public static <N> Path<N> longestBfsPath(Function<N, Stream<N>> successors, N origin) {
+    AtomicReference<SearchNode<N>> lastNode = new AtomicReference<>();
+    bft(successors, origin, n -> lastNode.set(n));
+    return lastNode.get() == null
+        ? null
+        : new Path<>(lastNode.get().constructPath(), lastNode.get().cost);
+  }
+
+  public static <N> void breathFirstTraversal(Graph<N> graph, N origin, Consumer<N> consumer) {
+    bft(n -> graph.successors(n).stream(), origin, n -> consumer.accept(n.node));
+  }
+
+  public static <N> void breathFirstTraversal(
+      Function<N, Stream<N>> successors, N origin, Consumer<N> consumer) {
+    bft(successors, origin, n -> consumer.accept(n.node));
+  }
+
+  private static <N> void bft(
+      Function<N, Stream<N>> successors, N origin, Consumer<SearchNode<N>> consumer) {
     ArrayDeque<SearchNode<N>> fringe = new ArrayDeque<>();
     HashSet<N> visited = new HashSet<>();
     fringe.offer(new SearchNode<>(origin, null, 0));
@@ -81,6 +101,7 @@ public class GraphUtils {
       if (!visited.add(current.node)) {
         continue;
       }
+      consumer.accept(current);
       successors.apply(current.node).forEach(next -> {
         if (!visited.contains(next)) {
           fringe.offer(new SearchNode<>(next, current, current.cost + 1));
@@ -88,11 +109,14 @@ public class GraphUtils {
       });
       lastNode = current;
     }
-
-    return lastNode == null ? null : new Path<>(lastNode.constructPath(), lastNode.cost);
   }
 
-  public static <N, E> Function<N, Iterable<Pair<N, E>>> successorFromValueGraph(
+  private static <N> List<N> topologicalSort(Graph<N> dag) {
+    // TODO: implement.
+    return null;
+  }
+
+  private static <N, E> Function<N, Iterable<Pair<N, E>>> successorFromValueGraph(
       ValueGraph<N, E> graph) {
     return n -> graph.successors(n)
         .stream()
