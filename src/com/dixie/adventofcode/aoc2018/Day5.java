@@ -1,13 +1,11 @@
 package com.dixie.adventofcode.aoc2018;
 
 import com.dixie.adventofcode.lib.Day;
-import com.google.common.base.Predicates;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.IntPredicate;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
