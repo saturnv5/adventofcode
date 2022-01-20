@@ -94,10 +94,9 @@ public class GraphUtils {
     ArrayDeque<SearchNode<N>> fringe = new ArrayDeque<>();
     fringe.offer(new SearchNode<>(origin, null, 0));
 
-    SearchNode<N> lastNode = null;
     while (!fringe.isEmpty()) {
       SearchNode<N> current = fringe.poll();
-      if (!visitor.visit(lastNode.node)) {
+      if (!visitor.visit(current.node)) {
         continue;
       }
       consumer.accept(current);
@@ -106,12 +105,25 @@ public class GraphUtils {
           fringe.offer(new SearchNode<>(next, current, current.cost + 1));
         }
       });
-      lastNode = current;
     }
   }
 
-  private static <N> void topologicalTraversal(Graph<N> dag, Consumer<N> consumer) {
-    // TODO: implement.
+  public static <N extends Comparable<N>> void topologicalTraversal(
+      Graph<N> dag, Consumer<N> consumer) {
+    PriorityQueue<N> fringe = new PriorityQueue<>();
+    dag.nodes().stream().filter(n -> dag.inDegree(n) == 0).forEach(fringe::offer);
+    DefaultVisitor<N> visitor = new DefaultVisitor<>();
+    while (!fringe.isEmpty()) {
+      N current = fringe.poll();
+      if (!visitor.visit(current)) {
+        continue;
+      }
+      consumer.accept(current);
+      Graphs.reachableNodes(dag, current).stream()
+          .filter(Predicate.not(visitor::hasVisited))
+          .filter(s -> dag.predecessors(s).stream().allMatch(visitor::hasVisited))
+          .forEach(fringe::offer);
+    }
   }
 
   private static <N, E> Function<N, Iterable<Pair<N, E>>> successorFromValueGraph(
