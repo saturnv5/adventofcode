@@ -84,7 +84,11 @@ public class Space2D<T> {
       removeValueAt(p);
     } else {
       space.put(p, value);
-      bounds.add(p);
+      if (space.size() == 1) {
+        bounds.setBounds(p.x, p.y, 0, 0);
+      } else {
+        bounds.add(p);
+      }
     }
   }
 
@@ -93,7 +97,11 @@ public class Space2D<T> {
       removeValueAt(p);
     } else {
       space.put(new Point(p), value);
-      bounds.add(p);
+      if (space.size() == 1) {
+        bounds.setBounds(p.x, p.y, 0, 0);
+      } else {
+        bounds.add(p);
+      }
     }
   }
 
@@ -130,9 +138,9 @@ public class Space2D<T> {
   public String toPrintableImage(Function<T, String> valueConverter) {
     StringBuilder sb = new StringBuilder();
     Point p = new Point();
-    for (int y = bounds.y; y < bounds.y + bounds.height; y++) {
+    for (int y = bounds.y; y <= bounds.y + bounds.height; y++) {
       sb.append('\n');
-      for (int x = bounds.x; x < bounds.x + bounds.width; x++) {
+      for (int x = bounds.x; x <= bounds.x + bounds.width; x++) {
         p.move(x, y);
         sb.append(valueConverter.apply(getValueAt(p)));
       }
