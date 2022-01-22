@@ -43,7 +43,11 @@ public class Space2D<T> {
   }
 
   public Space2D(int width, int height, T defaultValue) {
-    bounds = new Rectangle(width, height);
+    this(new Rectangle(width, height), defaultValue);
+  }
+
+  public Space2D(Rectangle bounds, T defaultValue) {
+    this.bounds = bounds;
     if (defaultValue != null) {
       streamAllPointsInBounds().forEach(p -> space.put(p, defaultValue));
     }
