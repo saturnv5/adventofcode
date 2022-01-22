@@ -1,11 +1,14 @@
 package com.dixie.adventofcode.aoc2018;
 
 import com.dixie.adventofcode.lib.Day;
+import com.dixie.adventofcode.lib.Memoizer;
 import com.dixie.adventofcode.lib.Space2D;
 
 import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 public class Day11 extends Day {
   public static void main(String[] args) {
@@ -24,9 +27,21 @@ public class Day11 extends Day {
 
   @Override
   protected Object part1(List<String> lines) {
-    return fuelCells.streamAllPointsInBounds()
-        .max(Comparator.comparingInt(this::totalPowerAt))
+    Rectangle max = fuelCells.streamAllPointsInBounds()
+        .map(p -> new Rectangle(p.x, p.y, 3, 3))
+        .max(Comparator.comparingInt(this::totalPowerWithinSquare))
         .get();
+    return max.x + "," + max.y;
+  }
+
+  @Override
+  protected Object part2(List<String> lines) {
+    Rectangle max = fuelCells.streamAllPointsInBounds()
+        .flatMap(p -> IntStream.range(1, 301 - Math.max(p.x, p.y))
+            .mapToObj(size -> new Rectangle(p.x, p.y, size, size)))
+        .max(Comparator.comparingInt(this::totalPowerWithinSquare))
+        .get();
+    return max.x + "," + max.y + "," + max.width;
   }
 
   private int powerLevel(Point p) {
@@ -36,9 +51,30 @@ public class Day11 extends Day {
     return d100 - 5;
   }
 
-  private int totalPowerAt(Point p) {
-    return Space2D.streamAllPointsInBounds(new Rectangle(p.x, p.y, 3, 3))
-        .mapToInt(f -> fuelCells.getValueAt(f, 0))
-        .sum();
+  private int totalPowerWithinSquare(Rectangle square) {
+    return memoizedTotalPower.apply(new Point(square.x, square.y))
+        - memoizedTotalPower.apply(new Point(square.x, square.y + square.height))
+        - memoizedTotalPower.apply(new Point(square.x + square.width, square.y))
+        + memoizedTotalPower.apply(new Point(square.x + square.width, square.y + square.height));
+  }
+
+  private final Function<Point, Integer> memoizedTotalPower = Memoizer.memoize(this::totalPowerFromPoint);
+
+  private int totalPowerFromPoint(Point p) {
+    if (!fuelCells.getBounds().contains(p)) {
+      return 0;
+    }
+    if (p.x == 300 && p.y == 300) {
+      return fuelCells.getValueAt(p);
+    } else if (p.x == 300) {
+      return fuelCells.getValueAt(p) + memoizedTotalPower.apply(new Point(p.x, p.y + 1));
+    } else if (p.y == 300) {
+      return fuelCells.getValueAt(p) + memoizedTotalPower.apply(new Point(p.x + 1, p.y));
+    } else {
+      return fuelCells.getValueAt(p)
+          + memoizedTotalPower.apply(new Point(p.x + 1, p.y))
+          + memoizedTotalPower.apply(new Point(p.x, p.y + 1))
+          - memoizedTotalPower.apply(new Point(p.x + 1, p.y + 1));
+    }
   }
 }
