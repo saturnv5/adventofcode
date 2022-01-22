@@ -19,9 +19,8 @@ public class Day8 extends Day {
   private Node topLevelNode;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     topLevelNode = parse(StreamUtils.streamInts(lines.get(0)).iterator());
-    return super.solve(lines, part1);
   }
 
   @Override

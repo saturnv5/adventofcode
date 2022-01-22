@@ -15,9 +15,8 @@ public class Day19 extends Day {
   private long[] program;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     program = StreamUtils.streamLongs(lines.get(0), ",").toArray();
-    return super.solve(lines, part1);
   }
 
   @Override

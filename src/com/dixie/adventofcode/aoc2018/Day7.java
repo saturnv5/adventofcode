@@ -23,10 +23,9 @@ public class Day7 extends Day {
   private Set<Character> inProgressSteps;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     steps = GraphBuilder.directed().build();
     lines.stream().map(Day7::parseEdge).forEach(edge -> steps.putEdge(edge.first, edge.second));
-    return super.solve(lines, part1);
   }
 
   @Override

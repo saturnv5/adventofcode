@@ -5,16 +5,18 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public abstract class Day {
-
   public void solve() {
     System.out.println("Input:");
     Scanner scan = new Scanner(System.in);
     List<String> lines = StreamUtils.streamLines(scan)
             .takeWhile(line -> !line.equals("end"))
             .collect(Collectors.toList());
+    prepare(lines);
     System.out.println("Part 1: " + solve(lines, true));
     System.out.println("Part 2: " + solve(lines, false));
   }
+
+  protected void prepare(List<String> lines) { }
 
   protected Object solve(List<String> lines, boolean part1) {
     return part1 ? part1(lines) : part2(lines);

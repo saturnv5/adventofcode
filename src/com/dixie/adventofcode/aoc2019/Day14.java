@@ -18,9 +18,8 @@ public class Day14 extends Day {
   private ValueGraph<String, Reaction> reactionTree;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     reactionTree = parseTree(lines);
-    return super.solve(lines, part1);
   }
 
   @Override

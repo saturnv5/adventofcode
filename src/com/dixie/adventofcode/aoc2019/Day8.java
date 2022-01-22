@@ -16,9 +16,8 @@ public class Day8 extends Day {
   private List<List<Integer>> layers;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     layers = parseLayers(lines.get(0), 25 * 6);
-    return super.solve(lines, part1);
   }
 
   @Override

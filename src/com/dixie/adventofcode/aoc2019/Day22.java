@@ -21,11 +21,6 @@ public class Day22 extends Day {
   private static final BigInteger TOTAL_SHUFFLES = bigInt(101741582076661L);
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
-    return super.solve(lines, part1);
-  }
-
-  @Override
   protected Object part1(List<String> lines) {
     IntUnaryOperator shuffle = lines.stream()
         .map(Day22::parseFunction)

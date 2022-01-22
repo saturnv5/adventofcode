@@ -25,9 +25,8 @@ public class Day15 extends Day {
   private Space2D<Integer> space;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     space = constructSpace(lines);
-    return super.solve(lines, part1);
   }
 
   @Override

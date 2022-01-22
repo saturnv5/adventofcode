@@ -19,20 +19,18 @@ public class Day10 extends Day {
   private int secondsWaited = 0;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     lights = lines.stream().map(Day10::parseLight).toList();
-    return super.solve(lines, part1);
   }
 
   @Override
-  protected Object part1(List<String> lines) {
-    return waitUntilMessage().toPrintableImage(v -> v == null ? "  " : "██");
-  }
-
-  @Override
-  protected Object part2(List<String> lines) {
-    waitUntilMessage();
-    return secondsWaited;
+  protected Object solve(List<String> lines, boolean part1) {
+    Space2D<Boolean> letters = waitUntilMessage();
+    if (part1) {
+      return letters.toPrintableImage(v -> v == null ? "  " : "██");
+    } else {
+      return secondsWaited;
+    }
   }
 
   private Space2D<Boolean> waitUntilMessage() {

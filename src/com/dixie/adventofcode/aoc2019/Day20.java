@@ -23,9 +23,8 @@ public class Day20 extends Day {
   HashMap<String, Point> namedPortals;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     constructSpaceAndPortals(lines);
-    return super.solve(lines, part1);
   }
 
   @Override

@@ -19,11 +19,10 @@ public class Day6 extends Day {
   private List<Point> places;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     space = new Space2D<>();
     places = lines.stream().map(Day6::toPoint).toList();
     places.forEach(p -> space.setValueAt(p, p));
-    return super.solve(lines, part1);
   }
 
   @Override

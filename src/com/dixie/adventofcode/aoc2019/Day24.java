@@ -22,10 +22,9 @@ public class Day24 extends Day {
   private Space2D<Boolean> space0;
 
   @Override
-  protected Object solve(List<String> lines, boolean part1) {
+  protected void prepare(List<String> lines) {
     space0 = Space2D.parseFromStrings(lines, c -> c == '#');
     layers.put(0, space0);
-    return super.solve(lines, part1);
   }
 
   @Override
