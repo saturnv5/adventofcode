@@ -35,14 +35,16 @@ public class Day12 extends Day {
 
   private void spread() {
     Rectangle bounds = state.getBounds();
+    Space2D<Boolean> newState = Space2D.copyOf(state);
     IntStream.range(bounds.x - 2, bounds.x + bounds.width + 3).forEach(i -> {
       List<Boolean> surrounds =
           IntStream.range(i - 2, i + 3).mapToObj(x -> state.getValueAt(x, 0, false)).toList();
       boolean newValue = notes.getOrDefault(surrounds, false);
       if (newValue != state.getValueAt(i, 0, false)) {
-        state.setValueAt(i, 0, notes.getOrDefault(surrounds, false));
+        newState.setValueAt(i, 0, notes.getOrDefault(surrounds, false));
       }
     });
+    state = newState;
   }
 
   private static Pair<List<Boolean>, Boolean> parseNote(String note) {
