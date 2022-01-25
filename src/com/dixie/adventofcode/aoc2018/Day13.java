@@ -44,11 +44,8 @@ public class Day13 extends Day {
   @Override
   protected Object solve(List<String> lines, boolean part1) {
     // System.out.println(tracks.toPrintableImage(Day13::print));
+    Point firstCollision = null;
     while (true) {
-      if (carts.size() == 1) {
-        Point last = Iterables.getOnlyElement(carts.keySet());
-        return last.x + "," + last.y;
-      }
       List<Cart> sortedCarts = carts.values()
           .stream()
           .sorted(
@@ -62,12 +59,19 @@ public class Day13 extends Day {
         cart.moveStep();
         if (carts.containsKey(cart.location)) {
           carts.remove(cart.location);
-          if (part1) {
-            return cart.location.x + "," + cart.location.y;
+          if (firstCollision == null) {
+            firstCollision = cart.location;
           }
         } else {
           carts.put(new Point(cart.location), cart);
         }
+      }
+      if (part1 && firstCollision != null) {
+        return firstCollision.x + "," + firstCollision.y;
+      }
+      if (carts.size() == 1) {
+        Point last = Iterables.getOnlyElement(carts.keySet());
+        return last.x + "," + last.y;
       }
     }
   }
