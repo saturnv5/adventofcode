@@ -39,13 +39,16 @@ public class Day13 extends Day {
         }
       }
     }
-    super.prepare(lines);
   }
 
   @Override
   protected Object solve(List<String> lines, boolean part1) {
     // System.out.println(tracks.toPrintableImage(Day13::print));
     while (true) {
+      if (carts.size() == 1) {
+        Point last = Iterables.getOnlyElement(carts.keySet());
+        return last.x + "," + last.y;
+      }
       List<Cart> sortedCarts = carts.values()
           .stream()
           .sorted(
@@ -58,15 +61,9 @@ public class Day13 extends Day {
         carts.remove(cart.location);
         cart.moveStep();
         if (carts.containsKey(cart.location)) {
+          carts.remove(cart.location);
           if (part1) {
             return cart.location.x + "," + cart.location.y;
-          } else {
-            carts.remove(cart.location);
-            System.out.println(carts.size());
-            if (carts.size() == 1) {
-              Point last = Iterables.getOnlyElement(carts.keySet());
-              return last.x + "," + last.y;
-            }
           }
         } else {
           carts.put(new Point(cart.location), cart);
