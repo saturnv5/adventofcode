@@ -1,11 +1,9 @@
 package com.dixie.adventofcode.lib;
 
-import com.google.common.collect.Streams;
 import com.google.common.graph.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -57,15 +55,15 @@ public class GraphUtils {
 
     while (!fringe.isEmpty()) {
       SearchNode<N> current = fringe.poll();
-      if (endCondition.test(current.node)) {
-        return new Path<>(current.constructPath(), current.cost);
+      if (endCondition.test(current.getNode())) {
+        return current.constructPath();
       }
-      if (!visitor.visit(current.node)) {
+      if (!visitor.visit(current.getNode())) {
         continue;
       }
-      for (Pair<N, Long> next : successors.apply(current.node)) {
+      for (Pair<N, Long> next : successors.apply(current.getNode())) {
         if (!visitor.hasVisited(next.first)) {
-          fringe.offer(new SearchNode<>(next.first, current, current.cost + next.second));
+          fringe.offer(new SearchNode<>(next.first, current, current.getCost() + next.second));
         }
       }
     }
@@ -74,35 +72,37 @@ public class GraphUtils {
 
   public static <N> Path<N> longestBfsPath(Function<N, Stream<N>> successors, N origin) {
     AtomicReference<SearchNode<N>> lastNode = new AtomicReference<>();
-    bft(successors, origin, new DefaultVisitor<>(), n -> lastNode.set(n));
+    breadthFirstTraversal(successors, origin, new DefaultVisitor<>(), n -> lastNode.set(n));
     return lastNode.get() == null
         ? null
-        : new Path<>(lastNode.get().constructPath(), lastNode.get().cost);
+        : lastNode.get().constructPath();
   }
 
-  public static <N> void breathFirstTraversal(Graph<N> graph, N origin, Consumer<N> consumer) {
-    breathFirstTraversal(n -> graph.successors(n).stream(), origin, consumer);
+  public static <N> void breadthFirstTraversal(Graph<N> graph, N origin, Consumer<N> consumer) {
+    breadthFirstTraversal(n -> graph.successors(n).stream(), origin, consumer);
   }
 
-  public static <N> void breathFirstTraversal(
+  public static <N> void breadthFirstTraversal(
       Function<N, Stream<N>> successors, N origin, Consumer<N> consumer) {
-    bft(successors, origin, new DefaultVisitor<>(), n -> consumer.accept(n.node));
+    breadthFirstTraversal(
+        successors, origin, new DefaultVisitor<>(), n -> consumer.accept(n.getNode()));
   }
 
-  private static <N> void bft(Function<N, Stream<N>> successors, N origin, Visitor<N> visitor,
-      Consumer<SearchNode<N>> consumer) {
+  private static <N> void breadthFirstTraversal(
+      Function<N, Stream<N>> successors, N origin,
+      Visitor<N> visitor, Consumer<SearchNode<N>> consumer) {
     ArrayDeque<SearchNode<N>> fringe = new ArrayDeque<>();
     fringe.offer(new SearchNode<>(origin, null, 0));
 
     while (!fringe.isEmpty()) {
       SearchNode<N> current = fringe.poll();
-      if (!visitor.visit(current.node)) {
+      if (!visitor.visit(current.getNode())) {
         continue;
       }
       consumer.accept(current);
-      successors.apply(current.node).forEach(next -> {
+      successors.apply(current.getNode()).forEach(next -> {
         if (!visitor.hasVisited(next)) {
-          fringe.offer(new SearchNode<>(next, current, current.cost + 1));
+          fringe.offer(new SearchNode<>(next, current, current.getCost() + 1));
         }
       });
     }
@@ -132,34 +132,6 @@ public class GraphUtils {
         .stream()
         .map(m -> Pair.of(m, graph.edgeValue(n, m).get()))
         .toList();
-  }
-
-  private static class SearchNode<N> implements Comparable<SearchNode<N>> {
-    final N node;
-    final SearchNode<N> predeccessor;
-    final long cost;
-
-    SearchNode(N node, SearchNode<N> predeccessor, long cost) {
-      this.node = node;
-      this.predeccessor = predeccessor;
-      this.cost = cost;
-    }
-
-    List<N> constructPath() {
-      ArrayList<N> path = new ArrayList<>();
-      SearchNode<N> n = this;
-      while (n != null) {
-        path.add(n.node);
-        n = n.predeccessor;
-      }
-      Collections.reverse(path);
-      return path;
-    }
-
-    @Override
-    public int compareTo(SearchNode<N> o) {
-      return Long.compare(cost, o.cost);
-    }
   }
 
   private static class DefaultVisitor<N> implements Visitor<N> {
