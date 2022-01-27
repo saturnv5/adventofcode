@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -119,10 +120,11 @@ public class Space2D<T> {
   }
 
   public Stream<Point> streamOccurrencesOf(T value) {
-    return space.entrySet()
-            .stream()
-            .filter(e -> value.equals(e.getValue()))
-            .map(Map.Entry::getKey);
+    return streamOccurrencesOf(value::equals).map(Map.Entry::getKey);
+  }
+
+  public Stream<Map.Entry<Point, T>> streamOccurrencesOf(Predicate<T> matcher) {
+    return space.entrySet().stream().filter(e -> matcher.test(e.getValue()));
   }
 
   public Stream<Point> streamAllPoints() {

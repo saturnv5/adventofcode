@@ -1,11 +1,8 @@
 package com.dixie.adventofcode.aoc2018;
 
-import com.dixie.adventofcode.lib.Day;
-import com.dixie.adventofcode.lib.Direction;
-import com.dixie.adventofcode.lib.Space2D;
+import com.dixie.adventofcode.lib.*;
 
 import java.awt.*;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,6 +13,8 @@ public class Day15 extends Day {
     new Day15().solve();
   }
 
+  private static final int ATTACK_POWER = 3;
+  private static final int MAX_HP = 200;
   private static final List<Direction> SUCCESSOR_DIRECTIONS =
       List.of(Direction.NORTH, Direction.WEST, Direction.EAST, Direction.SOUTH);
 
@@ -26,15 +25,21 @@ public class Day15 extends Day {
   @Override
   protected Object solve(List<String> lines, boolean part1) {
     space = Space2D.parseFromStrings(lines, Day15::parseCell);
-    numElves = (int) space.streamAllPoints()
-        .map(space::getValueAt)
-        .filter(u -> u != null && u.type == Unit.Type.ELF)
-        .count();
-    numGoblins = (int) space.streamAllPoints()
-        .map(space::getValueAt)
-        .filter(u -> u != null && u.type == Unit.Type.GOBLIN)
-        .count();
+    numElves = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.ELF).count();
+    numGoblins = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.GOBLIN).count();
     return super.solve(lines, part1);
+  }
+
+  @Override
+  protected Object part1(List<String> lines) {
+    int rounds = 0;
+    while (simulateRound()) {
+      rounds++;
+    }
+    int totalHp = space.streamOccurrencesOf(u -> u.type != Unit.Type.WALL)
+        .mapToInt(e -> e.getValue().hitPoints)
+        .sum();
+    return rounds * totalHp;
   }
 
   private static Unit parseCell(int cell) {
@@ -48,9 +53,9 @@ public class Day15 extends Day {
 
   private boolean simulateRound() {
     HashSet<Unit> hasMoved = new HashSet<>(numElves + numGoblins);
-    AtomicBoolean hasCombatEnded = new AtomicBoolean(false);
+    AtomicBoolean combatContinues = new AtomicBoolean(true);
     space.streamAllPointsInBounds().forEach(p -> {
-      if (hasCombatEnded.get()) return;
+      if (!combatContinues.get()) return;
       Unit unit = space.getValueAt(p);
       if (unit == null || unit.type == Unit.Type.WALL) {
         return;
@@ -58,13 +63,47 @@ public class Day15 extends Day {
       if (!hasMoved.add(unit)) {
         return;
       }
-      hasCombatEnded.set(simulateUnit(p, unit));
+      combatContinues.set(simulateUnit(p, unit));
     });
-    return hasCombatEnded.get();
+    return combatContinues.get();
   }
 
   private boolean simulateUnit(Point location, Unit unit) {
-    return false;
+    if ((unit.type == Unit.Type.ELF && numGoblins == 0) ||
+        (unit.type == Unit.Type.GOBLIN && numElves == 0)) {
+      return false; // Combat has ended.
+    }
+    Pair<Point, Unit> adjEnemy = getAdjacentEnemy(location, unit);
+    if (adjEnemy == null) {
+      // Move first.
+      Path<Point> path = GraphUtils.<Point>shortestNonWeightedPath(
+          this::successors, location, p -> getAdjacentEnemy(p, unit) != null);
+      if (path != null) {
+        Point newLocation = path.getNodes().get(1);
+        space.removeValueAt(location);
+        space.setValueAt(newLocation, unit);
+        adjEnemy = getAdjacentEnemy(newLocation, unit);
+      }
+    }
+    if (adjEnemy != null) {
+      Unit enemy = adjEnemy.second;
+      enemy.hitPoints -= ATTACK_POWER;
+      if (enemy.hitPoints <= 0) {
+        space.removeValueAt(adjEnemy.first);
+        if (enemy.type == Unit.Type.ELF) numElves--;
+        if (enemy.type == Unit.Type.GOBLIN) numGoblins--;
+      }
+    }
+    return true;
+  }
+
+  private Pair<Point, Unit> getAdjacentEnemy(Point location, Unit unit) {
+    return SUCCESSOR_DIRECTIONS.stream()
+        .map(d -> d.apply(location))
+        .map(p -> Pair.of(p, space.getValueAt(p)))
+        .filter(
+            e -> e.second != null && e.second.type != Unit.Type.WALL && e.second.type != unit.type)
+        .findFirst().orElse(null);
   }
 
   private Stream<Point> successors(Point from) {
@@ -77,7 +116,7 @@ public class Day15 extends Day {
     enum Type { WALL, ELF, GOBLIN }
 
     final Type type;
-    int hitPoints = 200;
+    int hitPoints = MAX_HP;
 
     Unit(Type type) {
       this.type = type;
