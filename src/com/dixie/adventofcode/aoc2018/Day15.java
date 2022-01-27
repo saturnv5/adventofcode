@@ -34,6 +34,7 @@ public class Day15 extends Day {
   protected Object part1(List<String> lines) {
     int rounds = 0;
     while (simulateRound()) {
+      printSpace();
       rounds++;
     }
     int totalHp = space.streamOccurrencesOf(u -> u.type != Unit.Type.WALL)
@@ -110,6 +111,21 @@ public class Day15 extends Day {
     return SUCCESSOR_DIRECTIONS.stream()
         .map(d -> d.apply(from))
         .filter(p -> space.getValueAt(p) == null);
+  }
+
+  private void printSpace() {
+    System.out.println(space.toPrintableImage(Day15::toString));
+  }
+
+  private static String toString(Unit unit) {
+    if (unit == null) {
+      return " ";
+    }
+    return switch (unit.type) {
+      case WALL -> "█";
+      case ELF -> "E";
+      case GOBLIN -> "G";
+    };
   }
 
   private static class Unit {

@@ -1,8 +1,10 @@
 package com.dixie.adventofcode.lib;
 
+import com.google.common.base.Predicates;
 import com.google.common.graph.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -12,10 +14,7 @@ import java.util.stream.Stream;
 public class GraphUtils {
 
   public static <N> Path<N> shortestPath(Graph<N> graph, N origin, N destination) {
-    return shortestPath(n -> graph.successors(n)
-            .stream()
-            .map(m -> Pair.of(m, 1L))
-            .toList(), origin, destination);
+    return shortestNonWeightedPath(n -> graph.successors(n).stream(), origin, destination);
   }
 
   public static <N> Path<N> shortestPath(ValueGraph<N, Long> graph, N origin, N destination) {
@@ -34,8 +33,20 @@ public class GraphUtils {
 
   public static <N> Path<N> shortestNonWeightedPath(Function<N, Stream<N>> successors, N origin,
       Visitor<N> visitor, Predicate<N> endCondition) {
-    return shortestPath(
-        successors.andThen(s -> s.map(n -> Pair.of(n, 1L)).toList()), origin, visitor, endCondition);
+    AtomicReference<SearchNode<N>> lastNode = new AtomicReference<>();
+    AtomicBoolean foundEnd = new AtomicBoolean(false);
+    breadthFirstTraversal(successors, origin, visitor, n -> lastNode.set(n), n -> {
+      if (endCondition.test(n)) {
+        foundEnd.set(true);
+        return true;
+      }
+      return false;
+    });
+    if (foundEnd.get()) {
+      return lastNode.get().constructPath();
+    } else {
+      return null;
+    }
   }
 
   public static <N> Path<N> shortestPath(
@@ -72,7 +83,8 @@ public class GraphUtils {
 
   public static <N> Path<N> longestBfsPath(Function<N, Stream<N>> successors, N origin) {
     AtomicReference<SearchNode<N>> lastNode = new AtomicReference<>();
-    breadthFirstTraversal(successors, origin, new DefaultVisitor<>(), n -> lastNode.set(n));
+    breadthFirstTraversal(
+        successors, origin, new DefaultVisitor<>(), n -> lastNode.set(n), Predicates.alwaysFalse());
     return lastNode.get() == null
         ? null
         : lastNode.get().constructPath();
@@ -84,13 +96,13 @@ public class GraphUtils {
 
   public static <N> void breadthFirstTraversal(
       Function<N, Stream<N>> successors, N origin, Consumer<N> consumer) {
-    breadthFirstTraversal(
-        successors, origin, new DefaultVisitor<>(), n -> consumer.accept(n.getNode()));
+    breadthFirstTraversal(successors, origin,
+        new DefaultVisitor<>(), n -> consumer.accept(n.getNode()), Predicates.alwaysFalse());
   }
 
   private static <N> void breadthFirstTraversal(
       Function<N, Stream<N>> successors, N origin,
-      Visitor<N> visitor, Consumer<SearchNode<N>> consumer) {
+      Visitor<N> visitor, Consumer<SearchNode<N>> consumer, Predicate<N> endCondition) {
     ArrayDeque<SearchNode<N>> fringe = new ArrayDeque<>();
     fringe.offer(new SearchNode<>(origin, null, 0));
 
@@ -100,6 +112,9 @@ public class GraphUtils {
         continue;
       }
       consumer.accept(current);
+      if (endCondition.test(current.getNode())) {
+        return;
+      }
       successors.apply(current.getNode()).forEach(next -> {
         if (!visitor.hasVisited(next)) {
           fringe.offer(new SearchNode<>(next, current, current.getCost() + 1));
