@@ -36,7 +36,7 @@ public class GraphUtils {
     AtomicReference<SearchNode<N>> lastNode = new AtomicReference<>();
     AtomicBoolean foundEnd = new AtomicBoolean(false);
     breadthFirstTraversal(successors, origin, visitor, n -> lastNode.set(n), n -> {
-      if (endCondition.test(n)) {
+      if (endCondition.test(n.getNode())) {
         foundEnd.set(true);
         return true;
       }
@@ -100,9 +100,9 @@ public class GraphUtils {
         new DefaultVisitor<>(), n -> consumer.accept(n.getNode()), Predicates.alwaysFalse());
   }
 
-  private static <N> void breadthFirstTraversal(
+  public static <N> void breadthFirstTraversal(
       Function<N, Stream<N>> successors, N origin,
-      Visitor<N> visitor, Consumer<SearchNode<N>> consumer, Predicate<N> endCondition) {
+      Visitor<N> visitor, Consumer<SearchNode<N>> consumer, Predicate<SearchNode<N>> endCondition) {
     ArrayDeque<SearchNode<N>> fringe = new ArrayDeque<>();
     fringe.offer(new SearchNode<>(origin, null, 0));
 
@@ -112,7 +112,7 @@ public class GraphUtils {
         continue;
       }
       consumer.accept(current);
-      if (endCondition.test(current.getNode())) {
+      if (endCondition.test(current)) {
         return;
       }
       successors.apply(current.getNode()).forEach(next -> {
@@ -149,7 +149,7 @@ public class GraphUtils {
         .toList();
   }
 
-  private static class DefaultVisitor<N> implements Visitor<N> {
+  public static class DefaultVisitor<N> implements Visitor<N> {
     private final HashSet<N> visited = new HashSet<>();
 
     @Override

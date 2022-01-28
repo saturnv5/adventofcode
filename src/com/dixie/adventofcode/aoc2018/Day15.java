@@ -3,6 +3,7 @@ package com.dixie.adventofcode.aoc2018;
 import com.dixie.adventofcode.lib.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -98,8 +99,7 @@ public class Day15 extends Day {
     Pair<Point, Unit> adjEnemy = getAdjacentEnemy(location, unit);
     if (adjEnemy == null) {
       // Move first.
-      Path<Point> path = GraphUtils.<Point>shortestNonWeightedPath(
-          this::successors, location, p -> getAdjacentEnemy(p, unit) != null);
+      Path<Point> path = findPathToEnemy(location, unit);
       if (path != null) {
         Point newLocation = path.getNodes().get(1);
         space.removeValueAt(location);
@@ -117,6 +117,28 @@ public class Day15 extends Day {
       }
     }
     return true;
+  }
+
+  private Path<Point> findPathToEnemy(Point location, Unit unit) {
+    List<SearchNode<Point>> potentialPaths = new ArrayList<>();
+    GraphUtils.breadthFirstTraversal(
+        this::successors, location, new GraphUtils.DefaultVisitor<>(), n -> {}, n -> {
+          Pair<Point, Unit> adjEnemy = getAdjacentEnemy(n.getNode(), unit);
+          if (adjEnemy == null) return false;
+          if (potentialPaths.isEmpty() || potentialPaths.get(0).getCost() == n.getCost()) {
+            potentialPaths.add(n);
+            return false;
+          }
+          return true;
+    });
+    if (potentialPaths.isEmpty()) {
+      return null;
+    }
+    return potentialPaths.stream()
+        .min(Comparator.<SearchNode<Point>>comparingInt(n -> n.getNode().y)
+            .thenComparingInt(n -> n.getNode().x))
+        .get()
+        .constructPath();
   }
 
   private Pair<Point, Unit> getAdjacentEnemy(Point location, Unit unit) {
