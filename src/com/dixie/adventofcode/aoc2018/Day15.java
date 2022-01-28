@@ -14,7 +14,7 @@ public class Day15 extends Day {
     new Day15().solve();
   }
 
-  private static final int ATTACK_POWER = 3;
+  private static final int DEFAULT_ATTACK_POWER = 3;
   private static final int MAX_HP = 200;
   private static final List<Direction> SUCCESSOR_DIRECTIONS =
       List.of(Direction.NORTH, Direction.WEST, Direction.EAST, Direction.SOUTH);
@@ -22,17 +22,37 @@ public class Day15 extends Day {
   private Space2D<Unit> space;
   private int numElves;
   private int numGoblins;
-
-  @Override
-  protected Object solve(List<String> lines, boolean part1) {
-    space = Space2D.parseFromStrings(lines, Day15::parseCell);
-    numElves = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.ELF).count();
-    numGoblins = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.GOBLIN).count();
-    return super.solve(lines, part1);
-  }
+  private int elfAttackPower = DEFAULT_ATTACK_POWER;
 
   @Override
   protected Object part1(List<String> lines) {
+    space = Space2D.parseFromStrings(lines, this::parseCell);
+    numElves = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.ELF).count();
+    numGoblins = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.GOBLIN).count();
+    return simulateCombat();
+  }
+
+  @Override
+  protected Object part2(List<String> lines) {
+    while (true) {
+      elfAttackPower++;
+      initialise(lines);
+      int numStartingElves = numElves;
+      int outcome = simulateCombat();
+      if (numElves == numStartingElves) {
+        System.out.println("Min. elf attack power: " + elfAttackPower);
+        return outcome;
+      }
+    }
+  }
+
+  private void initialise(List<String> lines) {
+    space = Space2D.parseFromStrings(lines, this::parseCell);
+    numElves = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.ELF).count();
+    numGoblins = (int) space.streamOccurrencesOf(u -> u.type == Unit.Type.GOBLIN).count();
+  }
+
+  private int simulateCombat() {
     int rounds = 0;
     while (simulateRound()) {
       // printSpace();
@@ -44,11 +64,11 @@ public class Day15 extends Day {
     return rounds * totalHp;
   }
 
-  private static Unit parseCell(int cell) {
+  private Unit parseCell(int cell) {
     return switch (cell) {
-      case '#' -> new Unit(Unit.Type.WALL);
-      case 'E' -> new Unit(Unit.Type.ELF);
-      case 'G' -> new Unit(Unit.Type.GOBLIN);
+      case '#' -> new Unit(Unit.Type.WALL, 0);
+      case 'E' -> new Unit(Unit.Type.ELF, elfAttackPower);
+      case 'G' -> new Unit(Unit.Type.GOBLIN, DEFAULT_ATTACK_POWER);
       default -> null;
     };
   }
@@ -89,7 +109,7 @@ public class Day15 extends Day {
     }
     if (adjEnemy != null) {
       Unit enemy = adjEnemy.second;
-      enemy.hitPoints -= ATTACK_POWER;
+      enemy.hitPoints -= unit.attackPower;
       if (enemy.hitPoints <= 0) {
         space.removeValueAt(adjEnemy.first);
         if (enemy.type == Unit.Type.ELF) numElves--;
@@ -136,9 +156,11 @@ public class Day15 extends Day {
 
     final Type type;
     int hitPoints = MAX_HP;
+    int attackPower;
 
-    Unit(Type type) {
+    Unit(Type type, int attackPower) {
       this.type = type;
+      this.attackPower = attackPower;
     }
   }
 }
