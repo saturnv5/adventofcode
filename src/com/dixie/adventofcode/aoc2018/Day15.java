@@ -82,6 +82,10 @@ public class Day15 extends Day {
       if (unit == null || unit.type == Unit.Type.WALL) {
         return;
       }
+      if (numGoblins == 0 || numElves == 0) {
+        combatContinues.set(false);
+        return; // Combat has ended.
+      }
       if (!hasMoved.add(unit)) {
         return;
       }
@@ -91,10 +95,6 @@ public class Day15 extends Day {
   }
 
   private boolean simulateUnit(Point location, Unit unit) {
-    if ((unit.type == Unit.Type.ELF && numGoblins == 0) ||
-        (unit.type == Unit.Type.GOBLIN && numElves == 0)) {
-      return false; // Combat has ended.
-    }
     Pair<Point, Unit> adjEnemy = getAdjacentEnemy(location, unit);
     if (adjEnemy == null) {
       // Move first.
