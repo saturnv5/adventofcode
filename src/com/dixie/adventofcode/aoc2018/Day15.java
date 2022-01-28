@@ -3,6 +3,7 @@ package com.dixie.adventofcode.aoc2018;
 import com.dixie.adventofcode.lib.*;
 
 import java.awt.*;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -34,7 +35,7 @@ public class Day15 extends Day {
   protected Object part1(List<String> lines) {
     int rounds = 0;
     while (simulateRound()) {
-      printSpace();
+      // printSpace();
       rounds++;
     }
     int totalHp = space.streamOccurrencesOf(u -> u.type != Unit.Type.WALL)
@@ -92,7 +93,7 @@ public class Day15 extends Day {
       if (enemy.hitPoints <= 0) {
         space.removeValueAt(adjEnemy.first);
         if (enemy.type == Unit.Type.ELF) numElves--;
-        if (enemy.type == Unit.Type.GOBLIN) numGoblins--;
+        else if (enemy.type == Unit.Type.GOBLIN) numGoblins--;
       }
     }
     return true;
@@ -104,7 +105,9 @@ public class Day15 extends Day {
         .map(p -> Pair.of(p, space.getValueAt(p)))
         .filter(
             e -> e.second != null && e.second.type != Unit.Type.WALL && e.second.type != unit.type)
-        .findFirst().orElse(null);
+        .min(Comparator.<Pair<Point, Unit>>comparingInt(e -> e.second.hitPoints)
+            .thenComparingInt(e -> e.first.y)
+            .thenComparingInt(e -> e.first.x)).orElse(null);
   }
 
   private Stream<Point> successors(Point from) {
