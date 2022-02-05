@@ -15,18 +15,19 @@ public class Day17 extends Day {
     new Day17().solve();
   }
 
-  private enum Cell { SPRING, CLAY, WET_SAND, WATER, DEBUG }
+  private enum Cell { SPRING, CLAY, WET_SAND, WATER }
 
   private static final Splitter INPUT_SPLITTER =
       Splitter.onPattern(".=|, |\\.\\.").omitEmptyStrings();
-  private static final Point SPRING = new Point(500, 0);
 
   private final Space2D<Cell> ground = new Space2D<>();
+  private Point spring;
 
   @Override
   protected void prepare(List<String> lines) {
-    ground.setValueAt(SPRING, Cell.SPRING);
     lines.forEach(this::parseLine);
+    spring = new Point(500, ground.getBounds().y - 1);
+    ground.setValueAt(spring, Cell.SPRING);
     simulateWaterFlow();
     System.out.println(ground.toPrintableImage(Day17::cellToString));
   }
@@ -36,9 +37,14 @@ public class Day17 extends Day {
     return ground.streamOccurrencesOf(c -> c == Cell.WET_SAND || c == Cell.WATER).count();
   }
 
+  @Override
+  protected Object part2(List<String> lines) {
+    return ground.streamOccurrencesOf(c -> c == Cell.WATER).count();
+  }
+
   private void simulateWaterFlow() {
     ArrayDeque<Point> waterFringe = new ArrayDeque<>();
-    waterFringe.offer(new Point(SPRING));
+    waterFringe.offer(new Point(spring));
     while (!waterFringe.isEmpty()) {
       Point lead = waterFringe.poll();
       if (ground.getValueAt(lead) == Cell.WATER) {
@@ -123,7 +129,6 @@ public class Day17 extends Day {
       case CLAY -> "▓";
       case WET_SAND -> ".";
       case WATER -> "~";
-      case DEBUG -> "$";
     };
   }
 }
