@@ -156,4 +156,17 @@ public class Space2D<T> {
     }
     return sb.toString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Space2D<?> space2D = (Space2D<?>) o;
+    return space.equals(space2D.space);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(space);
+  }
 }

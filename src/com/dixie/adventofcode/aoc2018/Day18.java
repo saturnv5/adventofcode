@@ -3,6 +3,8 @@ package com.dixie.adventofcode.aoc2018;
 import com.dixie.adventofcode.lib.Day;
 import com.dixie.adventofcode.lib.Direction;
 import com.dixie.adventofcode.lib.Space2D;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -24,23 +26,33 @@ public class Day18 extends Day {
 
   @Override
   protected Object part1(List<String> lines) {
-    Space2D<Character> endLand = land;
-    for (int i = 0; i < 10; i++) endLand = advanceTime(endLand);
-    return endLand.streamOccurrencesOf(TREES).count() *
-        endLand.streamOccurrencesOf(LUMBERYARD).count();
+    Space2D<Character> nextLand = land;
+    for (int i = 0; i < 10; i++) nextLand = advanceTime(nextLand);
+    return nextLand.streamOccurrencesOf(TREES).count() *
+        nextLand.streamOccurrencesOf(LUMBERYARD).count();
   }
+
+  private static final int TARGET_2 = 1_000_000_000;
 
   @Override
   protected Object part2(List<String> lines) {
-    Space2D<Character> endLand = land;
-    for (int i = 0; i < 1_000_000_000; i++) {
-      if (i % 10_000_000 == 0) {
-        System.out.println(i);
+    BiMap<Integer, Space2D<Character>> prevLands = HashBiMap.create();
+    Space2D<Character> nextLand = land;
+    for (int i = 0; i < TARGET_2; i++) {
+      prevLands.put(i, nextLand);
+      nextLand = advanceTime(nextLand);
+      if (prevLands.containsValue(nextLand)) {
+        // Found cycle.
+        int cycleStart = prevLands.inverse().get(nextLand);
+        int cycleLength = i - cycleStart + 1;
+        int remaining = TARGET_2 - cycleStart;
+        int indexInCycle = remaining % cycleLength;
+        nextLand = prevLands.get(cycleStart + indexInCycle);
+        break;
       }
-      endLand = advanceTime(endLand);
     }
-    return endLand.streamOccurrencesOf(TREES).count() *
-        endLand.streamOccurrencesOf(LUMBERYARD).count();
+    return nextLand.streamOccurrencesOf(TREES).count() *
+        nextLand.streamOccurrencesOf(LUMBERYARD).count();
   }
 
   private static Space2D<Character> advanceTime(Space2D<Character> land) {
