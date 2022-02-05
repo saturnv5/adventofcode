@@ -91,9 +91,11 @@ public class Space2D<T> {
     } else {
       space.put(p, value);
       if (space.size() == 1) {
-        bounds.setBounds(p.x, p.y, 0, 0);
+        bounds.setBounds(p.x, p.y, 1, 1);
       } else {
         bounds.add(p);
+        if (p.x == bounds.x + bounds.width) bounds.width++;
+        if (p.y == bounds.y + bounds.height) bounds.height++;
       }
     }
   }

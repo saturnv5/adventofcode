@@ -14,8 +14,11 @@ public enum Direction {
   WEST(-1, 0),
   NORTH_WEST(-1, -1);
 
-  public static ImmutableList<Direction> CARDINALS = ImmutableList.of(NORTH, EAST, SOUTH, WEST);
-  public static ImmutableList<Direction> DIAGONALS =
+  public static final Direction UP = NORTH, DOWN = SOUTH, LEFT = WEST, RIGHT = EAST;
+
+  public static final ImmutableList<Direction> CARDINALS =
+      ImmutableList.of(NORTH, EAST, SOUTH, WEST);
+  public static final ImmutableList<Direction> DIAGONALS =
       ImmutableList.of(NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST);
 
   public final int dx, dy;
