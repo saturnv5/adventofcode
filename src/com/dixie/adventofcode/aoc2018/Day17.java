@@ -42,19 +42,14 @@ public class Day17 extends Day {
     while (!waterFringe.isEmpty()) {
       Point lead = waterFringe.poll();
       if (ground.getValueAt(lead) == Cell.WATER) {
-        // Already flooded up to here, retreat.
-        lead = retreatFringe(lead);
-        if (lead != null) waterFringe.offer(lead);
+        // Already flooded up to here.
         continue;
       }
       if (!ground.getBounds().contains(Direction.DOWN.apply(lead))) {
         // Reached bottom boundary.
         continue;
       }
-      if (tryFlowDown(lead)) {
-        // Successfully followed or filled downwards.
-        waterFringe.offer(lead);
-      } else {
+      if (!tryFlowDown(lead, waterFringe)) {
         // Try to flood left and right instead.
         Point left = Direction.LEFT.apply(lead);
         if (ground.getValueAt(left) == null) {
@@ -70,40 +65,28 @@ public class Day17 extends Day {
     }
   }
 
-  private Point retreatFringe(Point lead) {
-    Point up = Direction.UP.apply(lead);
-    while (ground.getBounds().contains(up)) {
-      Cell cell = ground.getValueAt(up);
-      if (cell == Cell.WET_SAND) {
-        return up;
-      } else if (cell != Cell.WATER) {
-        return null;
-      }
-      up = Direction.UP.apply(up);
-    }
-    return null;
-  }
-
-  private boolean tryFlowDown(Point lead) {
+  private boolean tryFlowDown(Point lead, ArrayDeque<Point> waterFringe) {
     Point down = Direction.DOWN.apply(lead);
     Cell cell = ground.getValueAt(down);
     if (cell == null || cell == Cell.WET_SAND) {
       ground.setValueAt(down, Cell.WET_SAND);
-      lead.setLocation(down);
-      return true;
-    } else if (tryFillLevel(lead)) {
-      lead.y--;
+      waterFringe.offer(down);
       return true;
     }
-    return false;
+    return tryFillLevel(lead, waterFringe);
   }
 
-  private boolean tryFillLevel(Point from) {
-    Point left = canFlowToClayInDirection(from, Direction.LEFT);
+  private boolean tryFillLevel(Point lead, ArrayDeque<Point> waterFringe) {
+    Point left = canFlowToClayInDirection(lead, Direction.LEFT);
     if (left == null) return false;
-    Point right = canFlowToClayInDirection(from, Direction.RIGHT);
+    Point right = canFlowToClayInDirection(lead, Direction.RIGHT);
     if (right == null) return false;
-    IntStream.range(left.x + 1, right.x).forEach(x -> ground.setValueAt(x, from.y, Cell.WATER));
+    IntStream.range(left.x + 1, right.x).forEach(x -> ground.setValueAt(x, lead.y, Cell.WATER));
+    // Find where all the new leads are after flooding the current one.
+    IntStream.range(left.x + 1, right.x)
+        .mapToObj(x -> new Point(x, lead.y - 1))
+        .filter(p -> ground.getValueAt(p) == Cell.WET_SAND)
+        .forEach(waterFringe::offer);
     return true;
   }
 
