@@ -1,5 +1,7 @@
 package com.dixie.adventofcode.aoc2018;
 
+import com.dixie.adventofcode.aoc2018.common.Instruction;
+import com.dixie.adventofcode.aoc2018.common.Instruction.Op;
 import com.dixie.adventofcode.lib.Day;
 import com.dixie.adventofcode.lib.Memoizer;
 import com.dixie.adventofcode.lib.StreamUtils;
@@ -86,36 +88,4 @@ public class Day16 extends Day {
   }
 
   private record Sample(int[] before, int[] instruction, int[] after) {}
-
-  private enum Op {
-    ADDR, ADDI, MULR, MULI, BANR, BANI, BORR, BORI, SETR, SETI, GTIR, GTRI, GTRR, EQIR, EQRI, EQRR
-  }
-
-  private record Instruction(Op op, int a, int b, int c) {
-    Instruction(Op op, int[] args) {
-      this(op, args[1], args[2], args[3]);
-    }
-
-    int[] execute(int[] r) {
-      switch (op) {
-        case ADDR -> r[c] = r[a] + r[b];
-        case ADDI -> r[c] = r[a] + b;
-        case MULR -> r[c] = r[a] * r[b];
-        case MULI -> r[c] = r[a] * b;
-        case BANR -> r[c] = r[a] & r[b];
-        case BANI -> r[c] = r[a] & b;
-        case BORR -> r[c] = r[a] | r[b];
-        case BORI -> r[c] = r[a] | b;
-        case SETR -> r[c] = r[a];
-        case SETI -> r[c] = a;
-        case GTIR -> r[c] = a > r[b] ? 1 : 0;
-        case GTRI -> r[c] = r[a] > b ? 1 : 0;
-        case GTRR -> r[c] = r[a] > r[b] ? 1 : 0;
-        case EQIR -> r[c] = a == r[b] ? 1 : 0;
-        case EQRI -> r[c] = r[a] == b ? 1 : 0;
-        case EQRR -> r[c] = r[a] == r[b] ? 1 : 0;
-      }
-      return r;
-    }
-  }
 }
