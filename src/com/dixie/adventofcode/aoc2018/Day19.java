@@ -15,7 +15,10 @@ public class Day19 extends Day {
     int ipReg = Integer.parseInt(lines.get(0).substring(4));
     List<Instruction> program = lines.stream().skip(1).map(Instruction::parse).toList();
     int[] r = new int[6];
-    int ip = 0;
-    return super.part1(lines);
+    while (r[ipReg] >= 0 && r[ipReg] < program.size()) {
+      program.get(r[ipReg]).execute(r);
+      r[ipReg]++;
+    }
+    return r[0];
   }
 }
