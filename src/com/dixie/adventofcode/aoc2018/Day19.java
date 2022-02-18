@@ -10,67 +10,40 @@ public class Day19 extends Day {
     new Day19().solve();
   }
 
+  private int ipReg;
+  private List<Instruction> program;
+
   @Override
-  protected Object part1(List<String> lines) {
-    int ipReg = Integer.parseInt(lines.get(0).substring(4));
-    List<Instruction> program = lines.stream().skip(1).map(Instruction::parse).toList();
+  protected void prepare(List<String> lines) {
+    ipReg = Integer.parseInt(lines.get(0).substring(4));
+    program = lines.stream().skip(1).map(Instruction::parse).toList();
+  }
+
+  @Override
+  protected Object solve(List<String> lines, boolean part1) {
+    return sumFactorsOf(getTargetNumber(part1));
+  }
+
+  private int getTargetNumber(boolean part1) {
     int[] r = new int[6];
+    if (!part1) r[0] = 1;
     while (r[ipReg] >= 0 && r[ipReg] < program.size()) {
       program.get(r[ipReg]).execute(r);
+      if (r[ipReg] == 0 && r[4] != 0) {
+        return r[4];
+      }
       r[ipReg]++;
     }
-    execute();
-    return r0;
+    return 0;
   }
 
-  int r0, r1, r2, r4, r5;
-
-  private void execute() {
-    // Move forward 16 + 1 instructions.
-    r4 += 2;
-    r4 *= r4;
-    r4 *= 19;
-    r4 *= 11;
-    r1 += 4;
-    r1 *= 22;
-    r1 += 2;
-    r4 += r1;
-    if (r0 == 0) {
-      // Back to start.
-      executeSub();
-      return;
+  private int sumFactorsOf(int num) {
+    int sum = 0;
+    for (int i = 1; i <= num; i++) {
+      if (num % i == 0) {
+        sum += i;
+      }
     }
-    r1 = 27;
-    r1 *= 28;
-    r1 += 29;
-    r1 *= 30;
-    r1 += 14;
-    r1 *= 32;
-    r4 += r1;
-    r0 = 0;
-    executeSub();
-  }
-
-  private void executeSub() {
-    r2 = 1;
-    r5 = 1;
-    while (true) {
-      r1 = r2 * r5;
-      r1 = r1 == r4 ? 1 : 0;
-      if (r1 == 1) {
-        r0 += r2;
-      }
-      r5++;
-      r1 = r5 > r4 ? 1 : 0;
-      if (r1 == 0) {
-        continue;
-      }
-      r2++;
-      r1 = r2 > r4 ? 1 : 0;
-      if (r1 == 1) {
-        return;
-      }
-      r5 = 1;
-    }
+    return sum;
   }
 }
