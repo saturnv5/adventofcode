@@ -90,8 +90,10 @@ public class GraphUtils {
         : lastNode.get().constructPath();
   }
 
-  public static <N> void breadthFirstTraversal(Graph<N> graph, N origin, Consumer<N> consumer) {
-    breadthFirstTraversal(n -> graph.successors(n).stream(), origin, consumer);
+  public static <N> void breadthFirstTraversal(Graph<N> graph, N origin,
+      Consumer<SearchNode<N>> consumer) {
+    breadthFirstTraversal(n -> graph.successors(n).stream(), origin, new DefaultVisitor<>(),
+        consumer, Predicates.alwaysFalse());
   }
 
   public static <N> void breadthFirstTraversal(

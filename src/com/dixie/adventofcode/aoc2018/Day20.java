@@ -11,6 +11,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.concurrent.atomic.LongAdder;
 
 public class Day20 extends Day {
   public static void main(String[] args) {
@@ -33,6 +34,16 @@ public class Day20 extends Day {
   @Override
   protected Object part1(List<String> lines) {
     return GraphUtils.longestBfsPath(p -> rooms.successors(p).stream(), START).getCost();
+  }
+
+  @Override
+  protected Object part2(List<String> lines) {
+    LongAdder numRooms = new LongAdder();
+    GraphUtils.breadthFirstTraversal(rooms, START, room -> {
+      if (room.getCost() >= 1000)
+        numRooms.increment();
+    });
+    return numRooms.longValue();
   }
 
   private void walk(Deque<Point> branchedRooms, Point currentRoom, int index) {
