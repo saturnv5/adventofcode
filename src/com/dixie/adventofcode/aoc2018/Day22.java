@@ -78,7 +78,7 @@ public class Day22 extends Day {
         .forEach(n -> successors.add(Pair.of(new State(n.x, n.y, state.tool()), 1L)));
     // Switch tools.
     IntStream.of(NO_TOOL, TORCH, CLIMBING_GEAR)
-        .filter(t -> t != state.tool())
+        .filter(t -> t != state.tool() && canEnter(state.x(), state.y(), t))
         .forEach(
             t -> successors.add(Pair.of(new State(state.x(), state.y(), t), TOOL_SWITCH_COST)));
     return successors;
