@@ -17,22 +17,11 @@ public class Day1 extends Day {
   }
 
   @Override
-  protected Object part1(List<String> lines) {
+  protected Object solve(List<String> lines, boolean part1) {
     int sum = 0;
+    int inc = part1 ? 1 : digits.length / 2;
     for (int i = 0; i < digits.length; i++) {
-      if (digits[i] == digits[(i + 1) % digits.length]) {
-        sum += digits[i];
-      }
-    }
-    return sum;
-  }
-
-  @Override
-  protected Object part2(List<String> lines) {
-    int sum = 0;
-    int halfLength = digits.length / 2;
-    for (int i = 0; i < digits.length; i++) {
-      if (digits[i] == digits[(i + halfLength) % digits.length]) {
+      if (digits[i] == digits[(i + inc) % digits.length]) {
         sum += digits[i];
       }
     }
