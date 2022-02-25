@@ -23,6 +23,11 @@ public class Day2 extends Day {
     return spreadsheet.stream().mapToInt(Day2::minMaxDiff).sum();
   }
 
+  @Override
+  protected Object part2(List<String> lines) {
+    return super.part2(lines);
+  }
+
   private static int minMaxDiff(int[] nums) {
     return Arrays.stream(nums).max().getAsInt() - Arrays.stream(nums).min().getAsInt();
   }
