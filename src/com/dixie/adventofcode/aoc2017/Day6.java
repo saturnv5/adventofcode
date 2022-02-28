@@ -5,7 +5,6 @@ import com.dixie.adventofcode.lib.StreamUtils;
 import com.google.common.primitives.Ints;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class Day6 extends Day {
