@@ -6,8 +6,6 @@ import com.google.common.collect.Multiset;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Day4 extends Day {
   public static void main(String[] args) {
