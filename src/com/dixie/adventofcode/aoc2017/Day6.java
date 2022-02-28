@@ -4,9 +4,9 @@ import com.dixie.adventofcode.lib.Day;
 import com.dixie.adventofcode.lib.StreamUtils;
 import com.google.common.primitives.Ints;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class Day6 extends Day {
   public static void main(String[] args) {
@@ -14,17 +14,21 @@ public class Day6 extends Day {
   }
 
   @Override
-  protected Object part1(List<String> lines) {
+  protected Object solve(List<String> lines, boolean part1) {
     int[] banks = StreamUtils.streamInts(lines.get(0), "\\s").toArray();
-    HashSet<List<Integer>> configs = new HashSet<>();
-    configs.add(Ints.asList(banks));
-    return Stream.generate(() -> redistribute(banks))
-        .map(Ints::asList)
-        .takeWhile(configs::add)
-        .count() + 1;
+    HashMap<List<Integer>, Integer> configs = new HashMap<>();
+    int steps = 0;
+    while (true) {
+      Integer index = configs.putIfAbsent(Ints.asList(banks), steps);
+      if (index != null) {
+        return part1 ? steps : steps - index;
+      }
+      redistribute(banks);
+      steps++;
+    }
   }
 
-  private static int[] redistribute(int[] banks) {
+  private static void redistribute(int[] banks) {
     int largestIndex = 0;
     for (int i = 1; i < banks.length; i++) {
       if (banks[i] > banks[largestIndex]) largestIndex = i;
@@ -34,6 +38,5 @@ public class Day6 extends Day {
     for (int i = (largestIndex + 1) % banks.length; val > 0; i = (i + 1) % banks.length, val--) {
       banks[i]++;
     }
-    return banks;
   }
 }
