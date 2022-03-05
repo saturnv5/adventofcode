@@ -13,6 +13,7 @@ public class Day11 extends Day {
     new Day11().solve();
   }
 
+  // Cartesian grid representation of a hex-grid.
   private static final Map<String, Point> HEX_DIR = Map.of(
       "n", new Point(0, -2),
       "ne", new Point(1, -1),
@@ -34,6 +35,7 @@ public class Day11 extends Day {
   }
 
   private static int dist(Point pos) {
+    // Coordinates are doubled in this representation.
     return (Math.abs(pos.x) + Math.abs(pos.y)) / 2;
   }
 }
