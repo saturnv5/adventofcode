@@ -143,6 +143,22 @@ public class GraphUtils {
     }
   }
 
+  public static <N> List<Set<N>> findConnectedComponents(Function<N, Stream<N>> successors,
+      Collection<N> nodes) {
+    List<Set<N>> components = new ArrayList<>();
+    HashSet<N> remainingNodes = new HashSet<>(nodes);
+    while (!remainingNodes.isEmpty()) {
+      N origin = remainingNodes.stream().findAny().get();
+      HashSet<N> component = new HashSet<>();
+      GraphUtils.breadthFirstTraversal(successors, origin, n -> {
+        component.add(n);
+        remainingNodes.remove(n);
+      });
+      components.add(component);
+    }
+    return components;
+  }
+
   private static <N, E> Function<N, Iterable<Pair<N, E>>> successorFromValueGraph(
       ValueGraph<N, E> graph) {
     return n -> graph.successors(n)

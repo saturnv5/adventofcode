@@ -39,13 +39,7 @@ public class Day12 extends Day {
 
   @Override
   protected Object part2(List<String> lines) {
-    HashSet<Integer> remainingNodes = new HashSet<>(pipes.nodes());
-    int numComponents = 0;
-    while (!remainingNodes.isEmpty()) {
-      int from = remainingNodes.stream().findAny().get();
-      GraphUtils.breadthFirstTraversal(pipes, from, n -> remainingNodes.remove(n.getNode()));
-      numComponents++;
-    }
-    return numComponents;
+    return GraphUtils.findConnectedComponents(n -> pipes.successors(n).stream(), pipes.nodes())
+        .size();
   }
 }
