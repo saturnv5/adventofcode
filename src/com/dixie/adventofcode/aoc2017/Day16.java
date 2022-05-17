@@ -2,6 +2,7 @@ package com.dixie.adventofcode.aoc2017;
 
 import com.dixie.adventofcode.lib.Day;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,12 +17,35 @@ public class Day16 extends Day {
     new Day16().solve();
   }
 
+  private Function<List<Character>, List<Character>> dance;
+
+  @Override
+  protected void prepare(List<String> lines) {
+    dance = parseMoves(lines.get(0));
+  }
+
   @Override
   protected Object part1(List<String> lines) {
     List<Character> programs = IntStream.rangeClosed('a', 'p')
         .mapToObj(c -> (char) c)
         .collect(Collectors.toCollection(ArrayList::new));
-    Function<List<Character>, List<Character>> dance = parseMoves(lines.get(0));
+    return executeDance(programs);
+  }
+
+  @Override
+  protected Object part2(List<String> lines) {
+    List<Character> programs = IntStream.rangeClosed('a', 'p')
+        .mapToObj(c -> (char) c)
+        .collect(Collectors.toCollection(ArrayList::new));
+    String target = "abcdefghijklmnop";
+    List<String> danceCycle = new ArrayList<>();
+    while (danceCycle.isEmpty() || !Iterables.getLast(danceCycle).equals(target))
+      danceCycle.add(executeDance(programs));
+    int targetReps = (int) 1E9 % danceCycle.size();
+    return danceCycle.get(targetReps - 1);
+  }
+
+  private String executeDance(List<Character> programs) {
     programs = dance.apply(programs);
     return programs.stream().map(String::valueOf).collect(Collectors.joining());
   }
