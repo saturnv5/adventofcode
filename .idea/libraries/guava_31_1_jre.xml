@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="guava-31.1-jre">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/OneDrive/Documents/Guava/guava-31.1-jre.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="https://guava.dev/releases/31.1-jre/api/docs/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
