@@ -15,9 +15,9 @@ abstract class Day {
 
   open fun solve(part1: Boolean) = if (part1) part1() else part2()
 
-  open fun part1() = Any()
+  open fun part1(): Any = "N/A"
 
-  open fun part2() = Any()
+  open fun part2(): Any = "N/A"
 }
 
 fun String.toInts(delimiter: String = " ") = splitToSequence(delimiter).map(String::toInt)
