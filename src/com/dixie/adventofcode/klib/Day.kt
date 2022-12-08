@@ -21,8 +21,19 @@ abstract class Day {
 }
 
 fun String.toInts(delimiter: String = " ") = splitToSequence(delimiter).map(String::toInt)
+
 fun String.toLongs(delimiter: String = " ") = splitToSequence(delimiter).map(String::toLong)
+
 fun String.toDoubles(delimiter: String = " ") = splitToSequence(delimiter).map(String::toDouble)
+
 fun List<String>.toInts() = asSequence().map(String::toInt)
+
 fun List<String>.toLongs() = asSequence().map(String::toLong)
+
 fun List<String>.toDoubles() = asSequence().map(String::toDouble)
+
+inline fun <T> List<String>.toMatrix(transformer: (Char) -> T) =
+  map { it.map(transformer) }.toList()
+
+fun List<List<*>>.matrixIndices() =
+  indices.asSequence().flatMap { row -> this[row].indices.asSequence().map { col -> row to col } }
