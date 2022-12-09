@@ -37,3 +37,13 @@ inline fun <T> List<String>.toMatrix(transformer: (Char) -> T) =
 
 fun List<List<*>>.matrixIndices() =
   indices.asSequence().flatMap { row -> this[row].indices.asSequence().map { col -> row to col } }
+
+enum class Direction(val dx: Int, val dy: Int) {
+  UP(0, -1),
+  DOWN(0, 1),
+  LEFT(-1, 0),
+  RIGHT(1, 0)
+}
+
+fun Pair<Int, Int>.move(dir: Direction, dist: Int = 1) =
+  (first + dir.dx * dist) to (second + dir.dy * dist)

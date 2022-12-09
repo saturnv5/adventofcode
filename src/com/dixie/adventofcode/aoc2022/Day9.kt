@@ -1,6 +1,8 @@
 package com.dixie.adventofcode.aoc2022
 
 import com.dixie.adventofcode.klib.Day
+import com.dixie.adventofcode.klib.Direction
+import com.dixie.adventofcode.klib.move
 import kotlin.math.abs
 
 class Day9 : Day() {
@@ -60,22 +62,11 @@ class Day9 : Day() {
   private fun moveTail(head: Pair<Int, Int>, tail: Pair<Int, Int>): Pair<Int, Int> {
     var x = tail.first
     var y = tail.second
-    if (head.first < tail.first) x--
-    else if (head.first > tail.first) x++
-    if (head.second < tail.second) y--
-    else if (head.second > tail.second) y++
+    if (head.first < tail.first) x-- else if (head.first > tail.first) x++
+    if (head.second < tail.second) y-- else if (head.second > tail.second) y++
     return x to y
   }
 }
-
-enum class Direction(val dx: Int, val dy: Int) {
-  UP(0, -1),
-  DOWN(0, 1),
-  LEFT(-1, 0),
-  RIGHT(1, 0)
-}
-
-private fun Pair<Int, Int>.move(dir: Direction) = (first + dir.dx) to (second + dir.dy)
 
 fun main() {
   Day9().run()
