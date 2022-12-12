@@ -33,7 +33,7 @@ class Day12 : Day() {
             newHeight.code - height.code <= 1
           }
       }
-    return graph.findShortedPath(start, end)?.cost ?: "Path not found!"
+    return graph.findShortestPath(start, end)?.cost ?: "Path not found!"
   }
 
   override fun part2(): Any {
@@ -52,7 +52,7 @@ class Day12 : Day() {
           }
       }
     return graph
-      .findShortedPath(
+      .findShortestPath(
         end,
         { (row, col) -> heightMap[row][col] == 'a' || heightMap[row][col] == 'S' }
       )

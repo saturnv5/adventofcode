@@ -10,10 +10,10 @@ class Graph<N : Any> {
     this.successors = successors
   }
 
-  fun findShortedPath(origin: N, destination: N, visitor: Visitor<N> = DefaultVisitor<N>()) =
-    findShortedPath(origin, destination::equals, visitor)
+  fun findShortestPath(origin: N, destination: N, visitor: Visitor<N> = DefaultVisitor<N>()) =
+    findShortestPath(origin, destination::equals, visitor)
 
-  fun findShortedPath(
+  fun findShortestPath(
     origin: N,
     destination: (N) -> Boolean,
     visitor: Visitor<N> = DefaultVisitor<N>()
