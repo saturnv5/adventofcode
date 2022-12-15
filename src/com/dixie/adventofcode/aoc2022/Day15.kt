@@ -22,7 +22,20 @@ class Day15 : Day() {
   }
 
   override fun part1(): Any {
-    return exclusionSizeAtRow(2_000_000)
+    val targetRow = 2_000_000
+    val beaconsOnRow = beacons.filter { it.y == targetRow }.map { it.x }.toMutableSet()
+    var size = 0
+
+    computeExclusionRangesAtRow(targetRow).forEach { range ->
+      val beaconsInRange = beaconsOnRow.filter(range::contains)
+      size += range.upperEndpoint() - range.lowerEndpoint() + 1
+      if (beaconsInRange.isNotEmpty()) {
+        beaconsOnRow.removeAll(beaconsInRange.toSet())
+        size -= beaconsInRange.size
+      }
+    }
+
+    return size
   }
 
   override fun part2(): Any {
@@ -36,22 +49,6 @@ class Day15 : Day() {
       }
     }
     return "Distress beacon not found!"
-  }
-
-  private fun exclusionSizeAtRow(row: Int): Int {
-    val beaconsOnRow = beacons.filter { it.y == row }.map { it.x }.toMutableSet()
-    var size = 0
-
-    computeExclusionRangesAtRow(row).forEach { range ->
-      val beaconsInRange = beaconsOnRow.filter(range::contains)
-      size += range.upperEndpoint() - range.lowerEndpoint() + 1
-      if (beaconsInRange.isNotEmpty()) {
-        beaconsOnRow.removeAll(beaconsInRange.toSet())
-        size -= beaconsInRange.size
-      }
-    }
-
-    return size
   }
 
   private fun computeExclusionRangesAtRow(row: Int): List<Range<Int>> {

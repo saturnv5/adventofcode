@@ -61,8 +61,6 @@ class Day12 : Day() {
   }
 }
 
-private data class SearchNode(val location: Pair<Int, Int>, val cost: Int)
-
 fun main() {
   Day12().run()
 }
