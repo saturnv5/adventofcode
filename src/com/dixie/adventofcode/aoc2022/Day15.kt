@@ -25,6 +25,19 @@ class Day15 : Day() {
     return exclusionSizeAtRow(2_000_000)
   }
 
+  override fun part2(): Any {
+    val maxCoord = 4_000_000
+    val xRange = Range.closed(0, maxCoord)
+    for (row in 0..maxCoord) {
+      val exclusionRanges = computeExclusionRangesAtRow(row).filter(xRange::isConnected)
+      if (exclusionRanges.size == 2) {
+        val col = exclusionRanges[0].upperEndpoint() + 1
+        return col.toLong() * maxCoord + row
+      }
+    }
+    return "Distress beacon not found!"
+  }
+
   private fun exclusionSizeAtRow(row: Int): Int {
     val beaconsOnRow = beacons.filter { it.y == row }.map { it.x }.toMutableSet()
     var size = 0
@@ -44,6 +57,8 @@ class Day15 : Day() {
   private fun computeExclusionRangesAtRow(row: Int): List<Range<Int>> {
     val ranges =
       sensors.mapNotNull { it.exclusionRangeAtRow(row) }.sortedBy(Range<Int>::lowerEndpoint)
+
+    if (ranges.isEmpty()) return ranges
 
     val mergedRanges = mutableListOf<Range<Int>>()
     var currentRange = ranges[0]
