@@ -20,11 +20,17 @@ abstract class Day {
   open fun part2(): Any = "N/A"
 }
 
-fun String.toInts(delimiter: String = " ") = splitToSequence(delimiter).map(String::toInt)
+fun String.toInts(delimiter: String = " ") =
+  splitToSequence(delimiter).filter(String::isNotEmpty).map(String::toInt)
 
-fun String.toLongs(delimiter: String = " ") = splitToSequence(delimiter).map(String::toLong)
+fun String.toLongs(delimiter: String = " ") =
+  splitToSequence(delimiter).filter(String::isNotEmpty).map(String::toLong)
 
-fun String.toDoubles(delimiter: String = " ") = splitToSequence(delimiter).map(String::toDouble)
+fun String.toDoubles(delimiter: String = " ") =
+  splitToSequence(delimiter).filter(String::isNotEmpty).map(String::toDouble)
+
+fun String.extractNumbers() =
+  map { if (it.isDigit() || it == '.' || it == '-') it else ' ' }.joinToString("")
 
 fun List<String>.toInts() = asSequence().map(String::toInt)
 
@@ -47,3 +53,9 @@ enum class Direction(val dx: Int, val dy: Int) {
 
 fun Pair<Int, Int>.move(dir: Direction, dist: Int = 1) =
   (first + dir.dx * dist) to (second + dir.dy * dist)
+
+val Pair<Int, Int>.x: Int
+  get() = first
+
+val Pair<Int, Int>.y: Int
+  get() = second
