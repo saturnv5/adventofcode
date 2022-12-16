@@ -2,12 +2,14 @@ package com.dixie.adventofcode.aoc2022
 
 import com.dixie.adventofcode.klib.Day
 import com.dixie.adventofcode.klib.extractNumbers
-import java.util.PriorityQueue
-import kotlin.math.max
+import com.dixie.adventofcode.lib.Memoizer
 
 class Day16 : Day() {
   private lateinit var valves: Map<String, Valve>
   private val nonZeroValves = mutableSetOf<String>()
+
+  private val maximumPressurePart1 = Memoizer.memoize(::maximumPressureReleasable)
+  private val maximumPressurePart2 = Memoizer.memoize(::maximumPressureReleasableWithElephants)
 
   override fun prepare() {
     valves =
@@ -24,37 +26,23 @@ class Day16 : Day() {
   }
 
   override fun part1(): Any {
-    val fringe = PriorityQueue<State> { s1, s2 ->
-      if (s1.totalPressureReleased == s2.totalPressureReleased) {
-        if (s1.flowRate == s2.flowRate) {
-          return@PriorityQueue s1.minutes.compareTo(s2.minutes)
-        }
-        return@PriorityQueue s2.flowRate.compareTo(s1.flowRate)
-      }
-      return@PriorityQueue s2.totalPressureReleased.compareTo(s1.totalPressureReleased)
-    }
+    return maximumPressurePart1.apply(State(setOf(), valves["AA"]!!, valves["AA"]!!, 0))
+  }
 
-    fringe.offer(State(setOf(), 0, 0, valves["AA"]!!, 0))
-    val visited = mutableSetOf<State>()
+  override fun part2(): Any {
+    return maximumPressurePart2.apply(State(setOf(), valves["AA"]!!, valves["AA"]!!, 0))
+  }
 
-    var maxPressureReleased = 0
+  private fun maximumPressureReleasable(state: State): Int {
+    if (state.minutes == 30) return 0
+    return state.nextStates(valves, nonZeroValves, false).maxOf(maximumPressurePart1::apply) +
+      state.flowRate
+  }
 
-    while (fringe.isNotEmpty()) {
-      val currentState = fringe.poll()
-      if (!visited.add(currentState)) continue
-
-      if (currentState.minutes == 29) {
-        maxPressureReleased = max(maxPressureReleased, currentState.totalPressureReleased + 1 * currentState.flowRate)
-        continue
-      }
-
-      currentState
-        .nextStates(valves, nonZeroValves)
-        .filterNot(visited::contains)
-        .forEach(fringe::offer)
-    }
-
-    return maxPressureReleased
+  private fun maximumPressureReleasableWithElephants(state: State): Int {
+    if (state.minutes == 26) return 0
+    return state.nextStates(valves, nonZeroValves, true).maxOf(maximumPressurePart2::apply) +
+      state.flowRate
   }
 }
 
@@ -62,40 +50,73 @@ private class Valve(val label: String, val flowRate: Int, val neighbours: List<S
 
 private data class State(
   val openValves: Set<String>,
-  val flowRate: Int,
-  val totalPressureReleased: Int,
-  val currentValve: Valve,
+  val humanValve: Valve,
+  val elephantValve: Valve,
   val minutes: Int
 ) {
+  var flowRate = 0
 
-  fun nextStates(valves: Map<String, Valve>, nonZeroValves: Set<String>): List<State> {
-    val states = mutableListOf<State>()
-
+  fun nextStates(
+    valves: Map<String, Valve>,
+    nonZeroValves: Set<String>,
+    includeElephants: Boolean,
+  ): List<State> {
     if (openValves.size == nonZeroValves.size) {
       // All non-zero valves already open.
-      states +=
-        State(openValves, flowRate, totalPressureReleased + flowRate, currentValve, minutes + 1)
+      return listOf(
+        State(openValves, humanValve, elephantValve, minutes + 1).apply {
+          flowRate = this@State.flowRate
+        }
+      )
     }
 
-    if (!openValves.contains(currentValve.label) && nonZeroValves.contains(currentValve.label)) {
+    val states = mutableListOf<State>()
+
+    if (!openValves.contains(humanValve.label) && nonZeroValves.contains(humanValve.label)) {
       // Open the current valve.
       val newOpenValves = mutableSetOf<String>()
       newOpenValves.addAll(openValves)
-      newOpenValves += currentValve.label
+      newOpenValves += humanValve.label
       states +=
-        State(
-          newOpenValves,
-          flowRate + currentValve.flowRate,
-          totalPressureReleased + flowRate,
-          currentValve,
-          minutes + 1
-        )
+        State(newOpenValves, humanValve, elephantValve, minutes + 1).apply {
+          flowRate = this@State.flowRate + humanValve.flowRate
+        }
     }
 
     // Explore other valves through tunnels.
-    currentValve.neighbours.forEach {
+    humanValve.neighbours.forEach {
       states +=
-        State(openValves, flowRate, totalPressureReleased + flowRate, valves[it]!!, minutes + 1)
+        State(openValves, valves[it]!!, elephantValve, minutes + 1).apply {
+          flowRate = this@State.flowRate
+        }
+    }
+
+    if (includeElephants) {
+      val elephantStates = mutableListOf<State>()
+      states.forEach { state ->
+        if (
+          !state.openValves.contains(elephantValve.label) &&
+            nonZeroValves.contains(elephantValve.label)
+        ) {
+          // Open the current valve.
+          val newOpenValves = mutableSetOf<String>()
+          newOpenValves.addAll(state.openValves)
+          newOpenValves += elephantValve.label
+          elephantStates +=
+            State(newOpenValves, state.humanValve, elephantValve, state.minutes).apply {
+              flowRate = state.flowRate + elephantValve.flowRate
+            }
+        }
+
+        // Explore other valves through tunnels.
+        elephantValve.neighbours.forEach {
+          elephantStates +=
+            State(state.openValves, state.humanValve, valves[it]!!, state.minutes).apply {
+              flowRate = state.flowRate
+            }
+        }
+      }
+      return elephantStates
     }
 
     return states
