@@ -5,12 +5,12 @@ import com.dixie.adventofcode.klib.Graph
 import com.dixie.adventofcode.klib.extractNumbers
 
 class Day16 : Day() {
-  private lateinit var valves: Map<String, Valve>
+  private lateinit var startingValve: Valve
   private val nonZeroValves = mutableSetOf<Valve>()
   private val travelTimes = mutableMapOf<Valve, List<Pair<Valve, Int>>>()
 
   override fun prepare() {
-    valves =
+    val valves =
       lines
         .map {
           val tokens = it.split(' ')
@@ -23,10 +23,12 @@ class Day16 : Day() {
         }
         .associateBy(Valve::label)
 
+    startingValve = valves["AA"]!!
+
     val graph =
       Graph.unweighted { valve: Valve -> valve.neighbours.asSequence().mapNotNull(valves::get) }
 
-    for (origin in nonZeroValves union setOf(valves["AA"]!!)) {
+    for (origin in nonZeroValves union setOf(startingValve)) {
       val destinationTimes = mutableListOf<Pair<Valve, Int>>()
       for (destination in nonZeroValves) {
         destinationTimes +=
@@ -41,30 +43,11 @@ class Day16 : Day() {
   }
 
   override fun part1(): Any {
-    return maximumPressureReleased(valves["AA"]!!, setOf(), 30)
+    return maximumPressureReleased(startingValve, startingValve, setOf(), 30, 0)
   }
 
   override fun part2(): Any {
-    return maximumPressureReleased(valves["AA"]!!, valves["AA"]!!, setOf(), 26, 26)
-  }
-
-  private fun maximumPressureReleased(
-    currentValve: Valve,
-    openedValves: Set<Valve>,
-    timeRemaining: Int
-  ): Int {
-    if (timeRemaining == 0) return 0
-    if (openedValves.size == nonZeroValves.size) return 0
-
-    return travelTimes[currentValve]!!
-      .filterNot { (v, t) -> openedValves.contains(v) || t >= timeRemaining }
-      .maxOfOrNull { (valve, travelTime) ->
-        val newTimeRemaining = timeRemaining - travelTime - 1
-        val pressureReleased = valve.flowRate * newTimeRemaining
-        return@maxOfOrNull pressureReleased +
-          maximumPressureReleased(valve, openedValves union setOf(valve), newTimeRemaining)
-      }
-      ?: 0
+    return maximumPressureReleased(startingValve, startingValve, setOf(), 26, 26)
   }
 
   private fun maximumPressureReleased(
@@ -101,7 +84,13 @@ class Day16 : Day() {
                   newElephantTimeRemaining
                 )
             }
-            ?: 0)
+            ?: maximumPressureReleased(
+              nextHumanValve,
+              elephantValve,
+              openedValves union setOf(nextHumanValve),
+              newHumanTimeRemaining,
+              elephantTimeRemaining
+            ))
       }
       ?: 0
   }
