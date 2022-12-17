@@ -28,7 +28,39 @@ class Day17 : Day() {
   }
 
   override fun part2(): Any {
-    return 0
+    val heights = mutableListOf<Int>()
+    val repeatedCombos = mutableMapOf<Pair<Int, Int>, MutableList<Int>>()
+
+    val cave = Space2D<Boolean>()
+    var rockIndex = 0
+    var jetIndex = 0
+    var comboOccurrences = listOf<Int>()
+    while (true) {
+      heights += -cave.bounds.y
+      val occurrences =
+        repeatedCombos.computeIfAbsent(rockIndex % rocks.size to jetIndex % jets.size) {
+          mutableListOf()
+        }
+      occurrences += rockIndex
+      if (occurrences.size >= 3) {
+        comboOccurrences = occurrences
+        break
+      }
+
+      jetIndex = simulateTetrisRound(cave, rockIndex++, jetIndex)
+    }
+
+    val totalReps = 1_000_000_000_000L
+    var remaining = totalReps - comboOccurrences[1]
+    val cycleLength = comboOccurrences[2] - comboOccurrences[1]
+    val cycleReps = remaining / cycleLength
+    remaining -= cycleLength * cycleReps
+
+    val cycleStartHeight = heights[comboOccurrences[1]]
+    val cycleHeight = heights[comboOccurrences[2]] - cycleStartHeight
+    val remainderHeight = heights[comboOccurrences[1] + remaining.toInt()] - cycleStartHeight
+
+    return cycleStartHeight + cycleHeight * cycleReps + remainderHeight
   }
 
   private fun simulateTetrisRound(cave: Space2D<Boolean>, rockIndex: Int, jetIndex: Int): Int {
