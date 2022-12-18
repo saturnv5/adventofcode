@@ -34,7 +34,7 @@ class Day17 : Day() {
     val cave = Space2D<Boolean>()
     var rockIndex = 0
     var jetIndex = 0
-    var comboOccurrences = listOf<Int>()
+    var comboOccurrences: List<Int>
     while (true) {
       heights += -cave.bounds.y
       val occurrences =

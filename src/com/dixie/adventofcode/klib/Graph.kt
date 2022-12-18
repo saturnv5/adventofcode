@@ -16,7 +16,7 @@ class Graph<N : Any> {
   fun findShortestPath(
     origin: N,
     destination: (N) -> Boolean,
-    visitor: Visitor<N> = DefaultVisitor<N>()
+    visitor: Visitor<N> = DefaultVisitor()
   ): Path<N>? {
     val fringe = PriorityQueue(Comparator.comparing(SearchNode<N>::cost))
     fringe.add(SearchNode(origin, null, 0))
@@ -31,6 +31,25 @@ class Graph<N : Any> {
         .forEach(fringe::offer)
     }
     return null
+  }
+
+  fun breadthFirstTraversal(
+    origin: N,
+    consumer: (N) -> Unit,
+    visitor: Visitor<N> = DefaultVisitor()
+  ) {
+    val queue = ArrayDeque<N>()
+    queue.addLast(origin)
+
+    while(queue.isNotEmpty()) {
+      val cur = queue.removeFirst()
+      if (!visitor.visit(cur)) continue
+      consumer(cur)
+
+      successors(cur).map(Pair<N, Long>::first)
+        .filterNot(visitor::hasVisited)
+        .forEach(queue::addLast)
+    }
   }
 
   companion object {
