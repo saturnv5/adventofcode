@@ -1,5 +1,9 @@
 package com.dixie.adventofcode.klib
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
 abstract class Day {
   protected lateinit var lines: List<String>
 
@@ -59,3 +63,7 @@ val Pair<Int, Int>.x: Int
 
 val Pair<Int, Int>.y: Int
   get() = second
+
+suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+  map { async { f(it) } }.awaitAll()
+}

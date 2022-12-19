@@ -2,8 +2,9 @@ package com.dixie.adventofcode.aoc2022
 
 import com.dixie.adventofcode.klib.Day
 import com.dixie.adventofcode.klib.extractNumbers
-import kotlin.math.max
+import com.dixie.adventofcode.klib.pmap
 import kotlin.math.min
+import kotlinx.coroutines.runBlocking
 
 class Day19 : Day() {
   private lateinit var blueprints: List<Blueprint>
@@ -23,18 +24,20 @@ class Day19 : Day() {
   }
 
   override fun part1(): Any {
-    val maxGeodes =
-      blueprints.map {
+    val maxGeodes = runBlocking {
+      blueprints.pmap {
         maximumGeodesCollected(it, State(numOreRobots = 1, timeRemaining = 24), mutableMapOf())
       }
+    }
     return maxGeodes.mapIndexed { i, geodes -> (i + 1) * geodes }.sum()
   }
 
   override fun part2(): Any {
-    val maxGeodes =
-      blueprints.take(3).map {
+    val maxGeodes = runBlocking {
+      blueprints.take(3).pmap {
         maximumGeodesCollected(it, State(numOreRobots = 1, timeRemaining = 32), mutableMapOf())
       }
+    }
     return maxGeodes.reduce { a, b -> a * b }
   }
 }
@@ -83,7 +86,7 @@ private data class State(
     // Always build geode robot if possible.
     buildGeodeRobot(blueprint)?.let(nextStates::add)
     if (nextStates.isEmpty()) {
-      // Otherwise try to build an obsidian robot.
+      // Otherwise, try to build an obsidian robot.
       buildObsidianRobot(blueprint)?.let(nextStates::add)
       nextStates += doNothing()
     }

@@ -10,5 +10,6 @@
     <orderEntry type="library" name="guava-31.1-jre" level="project" />
     <orderEntry type="library" name="failureaccess-1.0.1" level="project" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core.jvm" level="project" />
   </component>
 </module>
