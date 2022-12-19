@@ -2,6 +2,8 @@ package com.dixie.adventofcode.aoc2022
 
 import com.dixie.adventofcode.klib.Day
 import com.dixie.adventofcode.klib.extractNumbers
+import kotlin.math.max
+import kotlin.math.min
 
 class Day19 : Day() {
   private lateinit var blueprints: List<Blueprint>
@@ -86,11 +88,26 @@ private data class State(
       nextStates += doNothing()
     }
     if (nextStates.size == 1) {
+      // Can't build either geode or obsidian robot, try simpler ones.
       buildOreRobot(blueprint)?.let(nextStates::add)
       buildClayRobot(blueprint)?.let(nextStates::add)
     }
-    return nextStates
+    return nextStates.map { it.capResources(blueprint) }
   }
+
+  fun capResources(blueprint: Blueprint) =
+    // When there's enough robots, no need to keep excess resources.
+    copy(
+      numOre =
+        if (numOreRobots >= blueprint.maxOreCost) min(numOre, blueprint.maxOreCost) else numOre,
+      numClay =
+        if (numClayRobots >= blueprint.maxClayCost) min(numClay, blueprint.maxClayCost)
+        else numClay,
+      numObsidian =
+        if (numObsidianRobots >= blueprint.maxObsidianCost)
+          min(numObsidian, blueprint.maxObsidianCost)
+        else numObsidian,
+    )
 
   private fun doNothing() =
     copy(
