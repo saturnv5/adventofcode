@@ -3,6 +3,8 @@ package com.dixie.adventofcode.klib
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlin.math.max
+import kotlin.math.min
 
 abstract class Day {
   protected lateinit var lines: List<String>
@@ -50,9 +52,12 @@ fun List<List<*>>.matrixIndices() =
 
 enum class Direction(val dx: Int, val dy: Int) {
   UP(0, -1),
+  RIGHT(1, 0),
   DOWN(0, 1),
-  LEFT(-1, 0),
-  RIGHT(1, 0)
+  LEFT(-1, 0);
+
+  fun turnLeft() = Direction.values()[Math.floorMod(ordinal - 1, Direction.values().size)]
+  fun turnRight() = Direction.values()[(ordinal + 1) % Direction.values().size]
 }
 
 fun Pair<Int, Int>.move(dir: Direction, dist: Int = 1) =
@@ -63,6 +68,8 @@ val Pair<Int, Int>.x: Int
 
 val Pair<Int, Int>.y: Int
   get() = second
+
+fun clamp(num: Int, min: Int, max: Int) = max(min, min(max, num))
 
 suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
   map { async { f(it) } }.awaitAll()
