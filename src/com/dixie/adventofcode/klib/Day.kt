@@ -56,8 +56,10 @@ enum class Direction(val dx: Int, val dy: Int) {
   DOWN(0, 1),
   LEFT(-1, 0);
 
-  fun turnLeft() = Direction.values()[Math.floorMod(ordinal - 1, Direction.values().size)]
+  fun turnLeft() = Direction.values()[(ordinal + 3) % Direction.values().size]
   fun turnRight() = Direction.values()[(ordinal + 1) % Direction.values().size]
+
+  fun turnAround() = Direction.values()[(ordinal + 2) % Direction.values().size]
 }
 
 fun Pair<Int, Int>.move(dir: Direction, dist: Int = 1) =
