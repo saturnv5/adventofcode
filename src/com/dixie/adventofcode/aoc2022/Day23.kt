@@ -27,9 +27,16 @@ class Day23 : Day() {
     return area - numElves
   }
 
-  private fun simulateRound(round: Int) {
+  override fun part2(): Any {
+    var rounds = 10
+    while (true) {
+      if (!simulateRound(rounds++)) break
+    }
+    return rounds
+  }
+
+  private fun simulateRound(round: Int): Boolean {
     val moves = mutableMapOf<Point, MutableList<Point>>()
-    println(space.toPrintableImage { if (it != null) "#" else "." })
     // Propose moves.
     space.streamAllPoints().forEach { from ->
       if (!hasNeighbours(from)) return@forEach
@@ -48,11 +55,16 @@ class Day23 : Day() {
       }
     }
 
+    var moved = false
+
     // Make unique moves.
     moves.filterValues { it.size == 1 }.forEach { (to, from) ->
       space.removeValueAt(from[0])
       space.setValueAt(to, true)
+      moved = true
     }
+
+    return moved
   }
 
   private fun hasNeighbours(point: Point): Boolean {
