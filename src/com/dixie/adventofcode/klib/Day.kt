@@ -50,6 +50,9 @@ inline fun <T> List<String>.toMatrix(transformer: (Char) -> T) =
 fun List<List<*>>.matrixIndices() =
   indices.asSequence().flatMap { row -> this[row].indices.asSequence().map { col -> row to col } }
 
+fun List<List<*>>.matrixPositions() =
+  indices.asSequence().flatMap { y -> this[y].indices.asSequence().map { x -> x to y } }
+
 enum class Direction(val dx: Int, val dy: Int) {
   UP(0, -1),
   RIGHT(1, 0),
