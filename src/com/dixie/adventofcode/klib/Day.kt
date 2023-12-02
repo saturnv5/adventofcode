@@ -35,8 +35,7 @@ fun String.toLongs(delimiter: String = " ") =
 fun String.toDoubles(delimiter: String = " ") =
   splitToSequence(delimiter).filter(String::isNotEmpty).map(String::toDouble)
 
-fun String.extractNumbers() =
-  map { if (it.isDigit() || it == '.' || it == '-') it else ' ' }.joinToString("")
+fun String.extractNumbers() = filter { it.isDigit() || it == '.' || it == '-' }
 
 fun List<String>.toInts() = asSequence().map(String::toInt)
 
