@@ -17,9 +17,10 @@ class Day2 : Day() {
             var green = 0
             var blue = 0
             sample.split(",").forEach {
-              if (it.contains("red")) red = it.extractNumbers().toInt()
-              else if (it.contains("green")) green = it.extractNumbers().toInt()
-              else blue = it.extractNumbers().toInt()
+              val value = it.extractNumbers().trim().toInt()
+              if (it.contains("red")) red = value
+              else if (it.contains("green")) green = value
+              else blue = value
             }
             Sample(red, green, blue)
           }

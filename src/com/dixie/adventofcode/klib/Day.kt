@@ -1,10 +1,10 @@
 package com.dixie.adventofcode.klib
 
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlin.math.max
-import kotlin.math.min
 
 abstract class Day {
   protected lateinit var lines: List<String>
@@ -35,7 +35,8 @@ fun String.toLongs(delimiter: String = " ") =
 fun String.toDoubles(delimiter: String = " ") =
   splitToSequence(delimiter).filter(String::isNotEmpty).map(String::toDouble)
 
-fun String.extractNumbers() = filter { it.isDigit() || it == '.' || it == '-' }
+fun String.extractNumbers() =
+  map { if (it.isDigit() || it == '.' || it == '-') it else ' ' }.joinToString("")
 
 fun List<String>.toInts() = asSequence().map(String::toInt)
 
