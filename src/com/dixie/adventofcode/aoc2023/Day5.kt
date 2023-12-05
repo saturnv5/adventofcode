@@ -48,13 +48,29 @@ class Day5 : Day() {
     var minimum = Long.MAX_VALUE
     while (i < seedsToPlant.size) {
       val seeds = seedsToPlant[i] until seedsToPlant[i] + seedsToPlant[i + 1]
-      for (seed in seeds) {
-        val loc = seedToLocation(seed)
-        if (loc < minimum) minimum = loc
-      }
+      val minLoc =
+        seeds
+          .chuckRange(10_000_000L)
+          .parallelStream()
+          .map { it.minOf(seedToLocation) }
+          .mapToLong { it }
+          .min()
+          .asLong
+      if (minLoc < minimum) minimum = minLoc
       i += 2
     }
     return minimum
+  }
+
+  private fun LongRange.chuckRange(maxSize: Long): List<LongRange> {
+    val ranges = mutableListOf<LongRange>()
+    var i = this.first
+    while (i <= this.last) {
+      val j = kotlin.math.min(this.last + 1, i + maxSize)
+      ranges += i until j
+      i = j
+    }
+    return ranges
   }
 }
 
