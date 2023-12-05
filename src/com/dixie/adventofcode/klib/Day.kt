@@ -79,3 +79,7 @@ fun clamp(num: Int, min: Int, max: Int) = max(min, min(max, num))
 suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
   map { async { f(it) } }.awaitAll()
 }
+
+inline infix fun <A, B, C> ((A) -> B).then(crossinline other: (B) -> C): (A) -> C {
+  return { other(this(it)) }
+}
