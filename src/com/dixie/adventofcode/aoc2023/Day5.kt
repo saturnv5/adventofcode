@@ -6,32 +6,21 @@ import com.dixie.adventofcode.klib.toLongs
 
 class Day5 : Day() {
   private lateinit var seedsToPlant: List<Long>
-  private lateinit var seedToSoil: (Long) -> Long
-  private lateinit var soilToFertilizer: (Long) -> Long
-  private lateinit var fertilizerToWater: (Long) -> Long
-  private lateinit var waterToLight: (Long) -> Long
-  private lateinit var lightToTemperature: (Long) -> Long
-  private lateinit var temperatureToHumidity: (Long) -> Long
-  private lateinit var humidityToLocation: (Long) -> Long
+  private lateinit var seedToLocation: (Long) -> Long
 
   private var lineIndex = 0
 
   override fun prepare() {
     seedsToPlant = lines[lineIndex].substring(6).toLongs().toList()
     lineIndex = 3
-    seedToSoil = parseNextMap()
-    lineIndex += 2
-    soilToFertilizer = parseNextMap()
-    lineIndex += 2
-    fertilizerToWater = parseNextMap()
-    lineIndex += 2
-    waterToLight = parseNextMap()
-    lineIndex += 2
-    lightToTemperature = parseNextMap()
-    lineIndex += 2
-    temperatureToHumidity = parseNextMap()
-    lineIndex += 2
-    humidityToLocation = parseNextMap()
+    seedToLocation =
+      parseNextMap() then
+        parseNextMap() then
+        parseNextMap() then
+        parseNextMap() then
+        parseNextMap() then
+        parseNextMap() then
+        parseNextMap()
   }
 
   private fun parseNextMap(): (Long) -> Long {
@@ -41,6 +30,7 @@ class Day5 : Day() {
       ranges += (srcStart until srcStart + length) to (dstStart until dstStart + length)
     }
     ranges.sortBy { it.first.first }
+    lineIndex += 2
     return { input ->
       var index = ranges.binarySearchBy(input, selector = { it.first.first })
       if (index < 0) {
@@ -51,27 +41,9 @@ class Day5 : Day() {
     }
   }
 
-  override fun part1(): Any {
-    val seedToLocation =
-      seedToSoil then
-        soilToFertilizer then
-        fertilizerToWater then
-        waterToLight then
-        lightToTemperature then
-        temperatureToHumidity then
-        humidityToLocation
-    return seedsToPlant.minOf(seedToLocation)
-  }
+  override fun part1() = seedsToPlant.minOf(seedToLocation)
 
   override fun part2(): Any {
-    val seedToLocation =
-      seedToSoil then
-        soilToFertilizer then
-        fertilizerToWater then
-        waterToLight then
-        lightToTemperature then
-        temperatureToHumidity then
-        humidityToLocation
     var i = 0
     var minimum = Long.MAX_VALUE
     while (i < seedsToPlant.size) {
