@@ -37,11 +37,7 @@ class Day10 : Day() {
 
   override fun part1() = loop.size / 2
 
-  override fun part2(): Any {
-    val enclosed =
-      pipes.matrixPositions().filterNot(loopSet::contains).filter(::isWithinLoop).toList()
-    return enclosed.size
-  }
+  override fun part2() = pipes.matrixPositions().filterNot(loopSet::contains).count(::isWithinLoop)
 
   private fun isWithinLoop(pos: Pair<Int, Int>): Boolean {
     // Ray-march to the right and see how many times it intersects the loop.
